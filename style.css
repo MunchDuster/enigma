@@ -2,6 +2,14 @@
 	resize: none;
 	overflow:hidden;
 }
+.output{
+	overflow-wrap: break-word ;
+	overflow-y: scroll ;
+	height: 200px ;
+	width: 100% ;
+	border: 2px solid grey;
+	outline:none;
+}
 textarea{
 	font-family: 'JetBrains Mono';
 	font-size: large;
