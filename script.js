@@ -4,12 +4,12 @@ const textarea = document.getElementById("letxt");
 
 		var codecs;
 		function clear(){
-			textarea.value = '';
+			textarea.innerText = '';
 			outpt.innerText = '';
 		}
 		function swap(){
-			var temp = textarea.value;
-			textarea.value = outpt.innerText;
+			var temp = textarea.innerText;
+			textarea.innerText = outpt.innerText;
 			outpt.innerText = temp;
 		}
 		function wait(ms) {
@@ -17,7 +17,7 @@ const textarea = document.getElementById("letxt");
 		}
 		async function encode() {
 			await updateScripts();
-			var msg = textarea.value;
+			var msg = textarea.innerText;
 			
 			for (var i = 0; i < codecs.length; i++) {
 				
@@ -28,7 +28,7 @@ const textarea = document.getElementById("letxt");
 		async function decode() {
 				await updateScripts();
 
-				var msg = textarea.value;
+				var msg = textarea.innerText;
 				for (var i = codecs.length - 1; i > -1; i--) {
 					msg = codecs[i].decode(msg, Number(document.getElementById(codecs[i].id).value));
 				}
