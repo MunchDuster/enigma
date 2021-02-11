@@ -3,7 +3,7 @@ const textarea = document.getElementById("letxt");
 		const outpt = document.getElementById("outpt");
 
 		var codecs;
-		function clear(){
+		function cleartxt(){
 			textarea.innerText = '';
 			outpt.innerText = '';
 		}

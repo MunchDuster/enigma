@@ -3,6 +3,7 @@
 	overflow:hidden;
 }
 .input{
+	overflow-y:scroll;
 	overflow-wrap: break-word ;
 	resize: vertical;
 	height: 200px ;
