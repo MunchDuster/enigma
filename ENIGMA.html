@@ -1,0 +1,19 @@
+<html>
+<head>
+	<title>Enigma</title>
+	<link rel="stylesheet" href="style.css"
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+	Input: <textarea rows="10"cols="100" id="letxt">hi</textarea><br>
+	<button onclick="encode();">Encode</button>
+	<button onclick="decode();">Decode</button>
+	<button onclick="swap();">Swap</button><br>
+	Offset: <textarea class="coder" id="ofsefs" funcs="offset.js" rows="1" cols="10">0</textarea><br>
+	Multiplier: <textarea class="coder" id="fisdjfhe" funcs="multiplier.js" rows="1" cols="10">1</textarea><br>
+	Output: <div style="overflow-wrap: break-word ;overflow-y:scroll ;  height:200px;width:100% ;background-color: rgb(103, 255, 255);" id="outpt"></div>
+	<div id="scrcont"></div>
+	<script src="script.js"></script>
+<body>
+<html>

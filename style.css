@@ -1,0 +1,30 @@
+.coder{
+	resize: none;
+	overflow:hidden;
+}
+textarea{
+	font-family: 'JetBrains Mono';
+	font-size: large;
+	border: 2px solid grey;
+	outline:none;
+	margin: 5px;
+	padding: 0px;
+}
+
+button{
+	width: 100px;
+	height:28px;
+	border: none;
+	font-family: 'JetBrains Mono';
+	font-size: large;
+	border-radius: 20px;
+	outline: none;
+	background-color: #dddddd;
+}
+button:hover{
+	background-color: #aaaaaa;
+}
+body{
+	font-family: 'JetBrains Mono';
+	font-size: large;
+}
