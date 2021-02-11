@@ -3,6 +3,10 @@ const textarea = document.getElementById("letxt");
 		const outpt = document.getElementById("outpt");
 
 		var codecs;
+		function clear(){
+			textarea.value = '';
+			outpt.innerText = '';
+		}
 		function swap(){
 			var temp = textarea.value;
 			textarea.value = outpt.innerText;
