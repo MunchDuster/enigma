@@ -22,8 +22,9 @@ async function encode() {
   for (var i = 0; i < codecs.length; i++) {
     msg = codecs[i].encode(
       msg,
-      Number(document.getElementById(codecs[i].id).value)
+      Number(document.getElementById(codecs[i].id).innerText)
     );
+	outpt.innerText = "Loading " + ((i+1) / (codecs.length + 1)) + "%";
   }
   outpt.innerText = msg;
 }
@@ -34,13 +35,13 @@ async function decode() {
   for (var i = codecs.length - 1; i > -1; i--) {
     msg = codecs[i].decode(
       msg,
-      Number(document.getElementById(codecs[i].id).value)
+      Number(document.getElementById(codecs[i].id).innerText)
     );
   }
   outpt.innerText = msg;
 }
 async function updateScripts() {
-  outpt.innerText = "Loading...";
+  outpt.innerText = "Loading 0%";
   scriptContainer.textContent = "";
   codecs = [];
   const ins = Array.from(document.getElementsByClassName("coder"));
