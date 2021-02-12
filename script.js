@@ -72,5 +72,5 @@ function newId() {
 }
 
 function resizeme(obj){
-	obj.style.height = obj.scrollHeight;
+	//obj.style.height = obj.scrollHeight;
 }
