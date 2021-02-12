@@ -1,25 +1,27 @@
 <html>
 <head>
 	<title>Enigma</title>
-	<link rel="shortcut icon" type="image/png" href="meme man.png"/>
+	<link rel="shortcut icon" type="image/png" href="mememan.png"/>
 	<link rel="stylesheet" href="style.css">
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-	<h5>Input</h5> <div class="bigBoxWords" oninput="resizeme(this);" spellcheck="false" contentEditable="true" id="letxt">hi</div><br>
+	Input<div class="bigBoxWords" oninput="resizeme(this);" spellcheck="false" contentEditable="true" id="letxt">hi</div><br>
 
-	<button onclick="encode();">Encode</button>
-	<button onclick="decode();">Decode</button>
+	<button onclick="encode();">Encrypt</button>
+	<button onclick="decode();">Decrypt</button>
 	<button onclick="cleartxt();">Clear Output</button>
-	<button onclick="swap();">Swap</button><br>
+	<button onclick="swap();">Swap</button>
+	<button onclick="saveset();">Save Setup</button>
+	<button onclick="copyText();">Copy Output</button>
+	<br>
 
-	<div>Offset:    <div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="ofsefs" funcs="offset.js">0</div></div><br>
-	<div>Multiplier:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="fikdqe" funcs="multiplier.js">1</div></div><br>
-	<div>Rotate:    <div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="mbdgdz" funcs="rotate.js">0</div></div><br>
-	<div>Rotate:    <div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="ahdedx" funcs="rotate.js">0</div></div><br>
-
-	<h5>Output</h5><div class="bigBoxWords" oninput="resizeme(this);" id="outpt"></div><br>
+	Offset:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="ofsefs" funcs="offset.js">0</div><br>
+	Mltply:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="fikdqe" funcs="multiplier.js">1</div><br>
+	Rotate:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="mbdgdz" funcs="rotate.js">0</div><br>
+	
+	Output<div class="bigBoxWords" oninput="resizeme(this);" id="outpt"></div><br>
  
 	<p id="scrcont"></p>
 	<script src="script.js"></script>

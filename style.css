@@ -7,7 +7,7 @@
 	overflow-wrap: break-word ;
 	resize:none;
 	height: 200px ;
-	width: 100% ;
+	width: calc(100% - 20px);
 	border: 2px solid grey;
 	outline:none;
 	border-radius: 20px;
@@ -15,13 +15,17 @@
 .smallBoxWords{
 	overflow:hidden;
 	resize:none;
-	height: 20px;
+	height: 22px;
 	width: 150px ;
 	border: 2px solid grey;
 	outline:none;
 	border-radius: 10px;
+	vertical-align:top;
+	line-height: normal;
+	margin: 3px;
 }
 div{
+	display: inline-block;
 	border: 2px solid grey;
 	outline:none;
 	margin: 0px;
@@ -31,7 +35,7 @@ div{
 
 button{
 	user-select: none;
-	width: 100px;
+	width: auto;
 	height:28px;
 	border: none;
 	font-family: 'JetBrains Mono';
@@ -39,12 +43,31 @@ button{
 	border-radius: 20px;
 	outline: none;
 	background-color: #dddddd;
+	
+	margin-top: 3px;
 }
 button:hover{
 	background-color: #aaaaaa;
 }
 body{
+	margin: 0px;
 	text-align: center;
 	font-family: 'JetBrains Mono';
 	font-size: large;
+	line-height: 30px;
+}
+::-webkit-scrollbar {
+	  width: 10px;
+}
+/* Track */
+::-webkit-scrollbar-track {		  
+	background: white; 
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+	  background: grey; 
+}	
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	  background: grey; 
 }
