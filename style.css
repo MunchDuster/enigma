@@ -22,13 +22,11 @@
 	border-radius: 10px;
 }
 div{
-	font-family: 'JetBrains Mono';
-	font-size: large;
 	border: 2px solid grey;
 	outline:none;
-	margin: 5px;
+	margin: 0px;
 	padding: 2px;
-	background-color: #dddddd;
+	background-color: #eeeeee;
 }
 
 button{
