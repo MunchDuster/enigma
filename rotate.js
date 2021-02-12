@@ -8,8 +8,9 @@ codecs[codecs.length] = {
   },
   encode: (msg, move) => {
     var newstr = "";
+
     for (var i = 0; i < msg.length; i++) {
-      newstr += msg[i + (move % msg.length)];
+      newstr += msg[(i + move) % msg.length];
     }
     return newstr;
   },
