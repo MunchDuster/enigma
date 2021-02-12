@@ -24,6 +24,7 @@ async function encode() {
       msg,
       Number(document.getElementById(codecs[i].id).innerText)
     );
+	console.log(Math.ceil(((i + 1) * 100) / (codecs.length + 1)));
 	outpt.innerText = "Loading " + Math.ceil((i+1) * 100 / (codecs.length + 1)) + "%";
   }
   outpt.innerText = msg;
