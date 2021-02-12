@@ -2,30 +2,30 @@
 	resize: none;
 	overflow:hidden;
 }
-.input{
-	overflow-y:scroll;
+.bigBoxWords{
+	overflow-y:hidden;
 	overflow-wrap: break-word ;
-	resize: vertical;
+	resize:none;
 	height: 200px ;
 	width: 100% ;
 	border: 2px solid grey;
 	outline:none;
 }
-.output{
-	overflow-wrap: break-word ;
-	resize: vertical;
-	height: 200px ;
-	width: 100% ;
+.smallBoxWords{
+	overflow:hidden;
+	resize:none;
+	height: 35px;
+	width: 200px ;
 	border: 2px solid grey;
 	outline:none;
 }
-textarea{
+div{
 	font-family: 'JetBrains Mono';
 	font-size: large;
 	border: 2px solid grey;
 	outline:none;
 	margin: 5px;
-	padding: 0px;
+	padding: 2px;
 }
 
 button{
