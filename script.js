@@ -24,7 +24,7 @@ async function encode() {
       msg,
       Number(document.getElementById(codecs[i].id).innerText)
     );
-	outpt.innerText = "Loading " + ((i+1) / (codecs.length + 1)) + "%";
+	outpt.innerText = "Loading " + Math.ceil((float)(i+1) * 100 / (codecs.length + 1)) + "%";
   }
   outpt.innerText = msg;
 }
