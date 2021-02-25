@@ -7,23 +7,39 @@
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-	Input<div class="bigBoxWords" oninput="resizeme(this);" spellcheck="false" contentEditable="true" id="letxt">hi</div><br>
-
+	In<div class="bigBoxWords" oninput="resizeme(this);" spellcheck="false" contentEditable="true" id="letxt">hello there</div><br>
 	<button onclick="encode();">Encrypt</button>
 	<button onclick="decode();">Decrypt</button>
-	<button onclick="cleartxt();">Clear Output</button>
-	<button onclick="swap();">Swap</button>
-	<button onclick="saveset();">Save Setup</button>
-	<button onclick="copyText();">Copy Output</button>
-	<br>
-
-	Offset:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="ofsefs" funcs="offset.js">0</div><br>
-	Mltply:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="fikdqe" funcs="multiplier.js">1</div><br>
-	Rotate:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="mbdgdz" funcs="rotate.js">0</div><br>
+	<button onclick="textarea.innerText = ' ';">Clear In</button>
+	<button onclick="outpt.innerText = '';">Clear Out</button>
+	<button onclick="saveset();">Save Settings</button>
+	<button onclick="textarea.innerText = textarea.textContent;">Remove Formatting</button>
+	<button onclick="copyText();">Copy Out</button>
 	
-	Output<div class="bigBoxWords" oninput="resizeme(this);" id="outpt"></div><br>
- 
+	<button onclick="swap();">Swap</button>
+	<br>
+	<div style="border: none; text-align: left; width:100%; position:static; right:0px; display:inline-block; height: auto; background-color: white;">
+	<div style="border: none; text-align: right; width:40%; position:static; right:0px; display:inline-block; height: auto; background-color: white;">
+	Offset: <div spellcheck="false" contentEditable="true" maxval="20" minval="-20" class="clamped intOnly coder smallBoxWords" id="ofsefs" funcs="offset.js">0</div>
+	<br>
+	Multiply: <div spellcheck="false" contentEditable="true" class="intOnly posOnly coder smallBoxWords" id="fikdqe" funcs="multiplier.js">1</div>
+	<br>
+	Rotate: <div spellcheck="false" contentEditable="true" class="intOnly coder smallBoxWords" id="mbdgdz" funcs="rotate.js">0</div>
+	<br>
+	Noise: <div spellcheck="false" contentEditable="true" class="intOnly coder smallBoxWords" id="dvanhk" funcs="noise.js">0</div>
+	<br>
+	Order: <div spellcheck="false" contentEditable="true" class="intOnly posOnly order smallBoxWords" id="wqmlsa">0123</div>
+	</div>
+	</div>
+	<br>
+	Out<div class="bigBoxWords" id="outpt">outputs</div><br>
+	
 	<p id="scrcont"></p>
 	<script src="script.js"></script>
+	<p style="position:absolute; bottom: var(height); margin-bottom: 0px; color:beige; vertical-align: middle; width: 100%; height: 28px; background-color: rgb(105, 104, 104); font-size: small;">
+	Noise provided by <a style="color: beige;" href="https://github.com/davidbau">David Bau</a>
+	</p>
+	
+	
 <body>
 <html>

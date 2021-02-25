@@ -3,7 +3,7 @@ codecs[codecs.length] = {
     var newstr = "";
     for (var i = 0; i < msg.length; i++) {
     newstr += String.fromCharCode(
-      msg.charCodeAt(i) - parseInt(eval(move.replace("chr", i)))
+      msg.charCodeAt(i) - parseInt(move)
     );    }
     return newstr;
   },
@@ -11,11 +11,8 @@ codecs[codecs.length] = {
     var newstr = "";
     for (var i = 0; i < msg.length; i++) {
     newstr += String.fromCharCode(
-      msg.charCodeAt(i) + parseInt(eval(move.replace("chr", i)))
+      msg.charCodeAt(i) + parseInt(move)
     );    }
     return newstr;
   },
 };
-
-
-

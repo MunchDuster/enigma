@@ -1,8 +1,9 @@
 codecs[codecs.length] = {
   decode: (msg, move) => {
     var newstr = "";
+	var amt = parseInt(move);
     for (var i = 0; i < msg.length; i++) {
-      	var num = (i - parseInt(eval(move.replace("chr", i)))) % msg.length;
+      	var num = (i - amt) % msg.length;
         num = num < 0 ? msg.length + num : num;
         newstr += msg[num];
     }
@@ -10,8 +11,9 @@ codecs[codecs.length] = {
   },
   encode: (msg, move) => {
     var newstr = "";
+	var amt = parseInt(move);
     for (var i = 0; i < msg.length; i++) {
-      var num = (i + parseInt(eval(move.replace("chr", i)))) % msg.length;
+      var num = (i + amt) % msg.length;
       num = num < 0 ? msg.length + num : num;
       newstr += msg[num];
     }

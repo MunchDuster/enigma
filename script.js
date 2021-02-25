@@ -1,12 +1,87 @@
 const textarea = document.getElementById("letxt");
 const scriptContainer = document.getElementById("scrcont");
 const outpt = document.getElementById("outpt");
+const ins = Array.from(document.getElementsByClassName("coder"));
+const orderIn = Array.from(document.getElementsByClassName("order"))[0];
 
-var lastIns = [];
-var codecs;
-function cleartxt() {
-  outpt.innerText = "";
-}
+//Setup the clamped
+Array.from(document.getElementsByClassName("clamped")).forEach((element) => {
+  var warnDiv = document.createElement("div");
+  warnDiv.className = "warning";
+  warnDiv.innerText =
+    "Warning: Outside of bounds (" +
+    element.getAttribute("minval") +
+    " to " +
+    element.getAttribute("maxval") + ").";
+	element.addEventListener("input", () => {
+		const max = Number(element.getAttribute("maxval"));
+		const min = Number(element.getAttribute("minval"));
+		const val = Number(element.innerText);
+    if (Number.isNaN(val) || val >= min && val <= max) {
+      warnDiv.style.display = "none";
+    } else {
+      warnDiv.style.display = "inline-block";
+    }
+  });
+  element.parentNode.insertBefore(warnDiv, element.nextSibling);
+});
+//Setup the intOnlys
+Array.from(document.getElementsByClassName("intOnly")).forEach((element) => {
+	var warnDiv = document.createElement("div");
+	warnDiv.className = "warning";
+	warnDiv.innerText = "Warning: Input is not integer.";
+	element.addEventListener('input', () => {
+		var isOk = true;
+		for (var i = 0; i < element.innerText.length; i++){
+			var code = element.innerText.charCodeAt(i);
+			if ((code < 48 || code >= 58) && code != 45) {
+				isOk = false;
+				break;
+			}
+		}
+		
+		if (isOk) {
+			warnDiv.style.display = "none";
+		} else {
+			warnDiv.style.display = "inline-block";
+		}
+	});
+	element.parentNode.insertBefore(warnDiv, element.nextSibling);
+});
+//Setup the posOnlys
+Array.from(document.getElementsByClassName("posOnly")).forEach((element) => {
+	var warnDiv = document.createElement("div");
+  warnDiv.className = "warning";
+  warnDiv.innerText = "Warning: Input is not positive.";
+  element.addEventListener("input", () => {
+    if (element.innerText.indexOf('-') == -1) {
+      warnDiv.style.display = "none";
+    } else {
+      warnDiv.style.display = "inline-block";
+    }
+  });
+  element.parentNode.insertBefore(warnDiv, element.nextSibling);
+});
+	
+var codecs = [];
+(async () => {
+	for (var i = 0; i < ins.length; i++) {
+		var id = newId();
+		var script = document.createElement("script");
+		script.src = ins[i].getAttribute("funcs");
+		script.id = id;
+		script.async = false;
+		var oldLength = codecs.length;
+		scriptContainer.appendChild(script);
+
+		var obj = document.getElementById(id);
+		while (oldLength >= codecs.length) {
+			await wait(50);
+		}
+		codecs[i].id = ins[i].id;
+	}
+})();
+
 function swap() {
   var temp = textarea.innerText;
   textarea.innerText = outpt.innerText;
@@ -15,35 +90,17 @@ function swap() {
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
-/*function getIndicesOf(searchStr, str, caseSensitive) {
-  var searchStrLen = searchStr.length;
-  if (searchStrLen == 0) {
-    return [];
-  }
-  var startIndex = 0,
-    index,
-    indices = [];
-  if (!caseSensitive) {
-    str = str.toLowerCase();
-    searchStr = searchStr.toLowerCase();
-  }
-  while ((index = str.indexOf(searchStr, startIndex)) > -1) {
-    indices.push(index);
-    startIndex = index + searchStrLen;
-  }
-  return indices;
-}*/
 async function encode() {
-outpt.innerText = "Loading 0%";
-  await updateScripts();
-  var msg = textarea.innerText;
-
-  for (var i = 0; i < codecs.length; i++) {
-    msg = codecs[i].encode(
+	outpt.innerText = "Loading 0%";
+	var msg = textarea.innerText;
+	var order = getOrder();
+	
+  for (var i = 0; i < order.length; i++) {
+    msg = codecs[order[i]].encode(
       msg,
-      document.getElementById(codecs[i].id).innerText
+      document.getElementById(codecs[order[i]].id).innerText
     );
-	outpt.innerText = "Loading " + Math.ceil((i * 100) / (codecs.length - 1)) + "%";
+	  outpt.innerText = "Loading " + Math.floor(i * 100 / (order.length - 1)) + "%";
   }
   outpt.innerText = msg;
 }
@@ -69,48 +126,30 @@ async function saveset(){
 	}
 	
 }
+function getOrder() {
+	var arr = [];
+	 orderIn.outerText.split('').forEach((e,i) => {
+		 arr[i] = parseInt(e);
+	 });
+	return arr;
+}
 async function decode() {
 outpt.innerText = "Loading 0%";
-  await updateScripts();
-
-  var msg = textarea.innerText;
-  for (var i = codecs.length - 1; i > -1; i--) {
-    msg = codecs[i].decode(
+	var msg = textarea.innerText;
+	var order = getOrder();
+  for (var i = order.length - 1; i > -1; i--) {
+    msg = codecs[order[i]].decode(
       msg,
-      document.getElementById(codecs[i].id).innerText
+      document.getElementById(codecs[order[i]].id).innerText
     );
-	outpt.innerText = "Loading " + Math.ceil((i * 100) / (codecs.length - 1)) + "%";
+	outpt.innerText = "Loading " + Math.ceil((i * 100) / (order.length - 1)) + "%";
   }
   outpt.innerText = msg;
-}
-async function updateScripts() {
-	scriptContainer.textContent = "";
-  	const ins = Array.from(document.getElementsByClassName("coder"));
-  	if (ins != lastIns) {
-    	codecs = [];
-   		for (var i = 0; i < ins.length; i++) {
-    		var id = newId();
-			var script = document.createElement("script");
-      		script.src = ins[i].getAttribute("funcs");
-      		script.id = id;
-      		script.async = false;
-      		var oldLength = codecs.length;
-      		scriptContainer.appendChild(script);
-
-      		var obj = document.getElementById(id);
-      		while (oldLength >= codecs.length) {
-        		await wait(50);
-      		}
-      		codecs[i].id = ins[i].id;
-		}
-		lastIns = ins;
-    }
-  return null;
 }
 function newId() {
   var id = "";
   for (var i = 0; i < 20; i++) {
-    id += String.fromCharCode(Math.random(65, 90));
+    id += String.fromCharCode(65 + parseInt(Math.random() * 25));
   }
   return id;
 }
@@ -128,11 +167,10 @@ async function copyText() {
 
   /* Alert the copied text */
 }
+
 //try to load saved setup
 try {
-	updateScripts();
 	var oldins = localStorage.getItem('settings').split("Object");
-	var ins = Array.from(document.getElementsByClassName("coder"));
 	var i=0;
 	ins.forEach((ele)=>{
 			var arr = oldins[i].split("Splitter");
@@ -142,7 +180,7 @@ try {
 			i++;
 		
 	});
-} catch (e) {
-  alert("Could not load.");
+} catch (e) {//Catch error
+  alert("Could not load settings. Please click the Save Settings button to remove this message next time.");
   throw(e);
 }
