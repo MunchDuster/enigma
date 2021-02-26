@@ -28,6 +28,7 @@
 	height: max-content;
 	min-height: 30px;
 	width: calc(100% - 20px);
+		
 	border: 2px solid grey;
 	outline:none;
 	border-radius: 20px;
@@ -37,7 +38,9 @@
 	overflow:hidden;
 	resize:none;
 	height: 22px;
-	width: 150px ;
+	min-width: 150px ;
+	width: max-content;
+	
 	border: 2px solid grey;
 	outline:none;
 	border-radius: 10px;

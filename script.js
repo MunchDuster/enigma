@@ -3,7 +3,7 @@ const scriptContainer = document.getElementById("scrcont");
 const outpt = document.getElementById("outpt");
 const ins = Array.from(document.getElementsByClassName("coder"));
 const orderIn = Array.from(document.getElementsByClassName("order"))[0];
-
+const footer = document.getElementById("footerboi");
 //Setup the clamped
 Array.from(document.getElementsByClassName("clamped")).forEach((element) => {
   var warnDiv = document.createElement("div");
@@ -16,7 +16,7 @@ Array.from(document.getElementsByClassName("clamped")).forEach((element) => {
 	element.addEventListener("input", () => {
 		const max = Number(element.getAttribute("maxval"));
 		const min = Number(element.getAttribute("minval"));
-		const val = Number(element.innerText);
+		const val = eval(element.innerText);
     if (Number.isNaN(val) || val >= min && val <= max) {
       warnDiv.style.display = "none";
     } else {
@@ -34,7 +34,7 @@ Array.from(document.getElementsByClassName("intOnly")).forEach((element) => {
 		var isOk = true;
 		for (var i = 0; i < element.innerText.length; i++){
 			var code = element.innerText.charCodeAt(i);
-			if ((code < 48 || code >= 58) && code != 45) {
+			if ((code < 48 || code >= 58) && code != 45) {//must be only 0 to 9 and -
 				isOk = false;
 				break;
 			}
@@ -62,7 +62,15 @@ Array.from(document.getElementsByClassName("posOnly")).forEach((element) => {
   });
   element.parentNode.insertBefore(warnDiv, element.nextSibling);
 });
+
+//Keep the footer at the bottom of the page
+var oriscroll = document.body.scrollHeight;
+setInterval(async () => {
+	if (document.body.scrollHeight > oriscroll) footer.style.position = 'static';
+	else footer.style.position = 'absolute';
+},50);
 	
+//Load all the codecs
 var codecs = [];
 (async () => {
 	for (var i = 0; i < ins.length; i++) {
@@ -75,7 +83,7 @@ var codecs = [];
 		scriptContainer.appendChild(script);
 
 		var obj = document.getElementById(id);
-		while (oldLength >= codecs.length) {
+		while (oldLength == codecs.length) {
 			await wait(50);
 		}
 		codecs[i].id = ins[i].id;
@@ -90,8 +98,29 @@ function swap() {
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+function newId() {
+  var id = "";
+  for (var i = 0; i < 20; i++) {
+    id += String.fromCharCode(65 + parseInt(Math.random() * 25));
+  }
+  return id;
+}
+function getOrder() {
+  var arr = [];
+  orderIn.outerText.split("").forEach((e, i) => {
+    arr[i] = parseInt(e);
+  });
+  return arr;
+}
+function replace(what, withwhat) {
+	var escapedFind = what.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+  textarea.innerText = textarea.innerText.replace(
+    new RegExp(escapedFind, "g"),
+    withwhat
+  );
+}
 async function encode() {
-	outpt.innerText = "Loading 0%";
+	outpt.innerText = "Loading...";
 	var msg = textarea.innerText;
 	var order = getOrder();
 	
@@ -99,39 +128,9 @@ async function encode() {
     msg = codecs[order[i]].encode(
       msg,
       document.getElementById(codecs[order[i]].id).innerText
-    );
-	  outpt.innerText = "Loading " + Math.floor(i * 100 / (order.length - 1)) + "%";
+	  );
   }
   outpt.innerText = msg;
-}
-async function saveset(){
-	try{
-	var savestuff = [];
-	var i=0;
-	Array.from(document.getElementsByClassName("coder")).forEach((ele)=>{
-	if(i>0){
-		savestuff += "Object";
-	}
-		savestuff += ele.id + "Splitter" + ele.innerText;
-		i++;
-	});
-		localStorage.setItem(
-      "settings",
-      savestuff
-    );
-		alert("Saved.");
-		
-	}catch(e){
-		alert("Could not save.");
-	}
-	
-}
-function getOrder() {
-	var arr = [];
-	 orderIn.outerText.split('').forEach((e,i) => {
-		 arr[i] = parseInt(e);
-	 });
-	return arr;
 }
 async function decode() {
 outpt.innerText = "Loading 0%";
@@ -146,15 +145,22 @@ outpt.innerText = "Loading 0%";
   }
   outpt.innerText = msg;
 }
-function newId() {
-  var id = "";
-  for (var i = 0; i < 20; i++) {
-    id += String.fromCharCode(65 + parseInt(Math.random() * 25));
+async function saveset() {
+  try {
+    var savestuff = [];
+    var i = 0;
+    Array.from(document.getElementsByClassName("coder")).forEach((ele) => {
+      if (i > 0) {
+        savestuff += "Object";
+      }
+      savestuff += ele.id + "Splitter" + ele.innerText;
+      i++;
+    });
+    localStorage.setItem("settings", savestuff);
+    alert("Saved.");
+  } catch (e) {
+    alert("Could not save.");
   }
-  return id;
-}
-function resizeme(obj){
-	//obj.style.height = obj.scrollHeight;
 }
 async function copyText() {
   /* Get the text field */
