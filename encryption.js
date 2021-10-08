@@ -1,17 +1,12 @@
 const inputModule = document.querySelector('.ModulesInput');
 const outputModule = document.querySelector('.ModulesOutput');
 
-const inputText = document.querySelector('.InputText');
-const outputText = document.querySelector('.OutputText');
 
 function encode() {
 	console.log('encoding');
 	var startModule = getModuleFromElement(inputModule);
-	console.log('startModule is ');
-	console.log(startModule);
-	var currentModules = [startModule.outputs[0].connection.module];
-
-	startModule.outputs[0].connection.value = inputText.value;
+	var endModule = getModuleFromElement(outputModule);
+	var currentModules = [startModule];
 
 	while (currentModules.length > 0) {
 		var nextModules = [];
@@ -26,15 +21,18 @@ function encode() {
 			var module = currentModules[i];
 			var inputValues = [];
 			for (var j = 0; j < module.inputs.length; j++) {
-				inputValues.push(module.inputs[j]);
+				inputValues.push(module.inputs[j].value);
 			}
+			console.log('Input values: ', inputValues);
 			var outputValues = getCodecFromName(module.name).encode(inputValues);
-			console.log(currentModules[i]);
+			console.log(module);
+
 			if (outputValues == null) {
-				outputText.innerText = currentModules[i].inputs[0].value;
+				//end of modules
 				return;
 			}
-			for (var j = 0; j < outputValues.length; j++) {
+
+			for (var j = 0; j < module.outputs.length; j++) {
 				module.outputs[j].connection.value = outputValues[j];
 				addToNextModules(module.outputs[j].connection.module);
 			}

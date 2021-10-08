@@ -1,14 +1,19 @@
+const inputText = document.querySelector('.InputText');
+const outputText = document.querySelector('.OutputText');
+
 var codecs = [
 	{
 		name: 'offset',
-		encode: (msg, move) => {
+		encode: ([msg, move]) => {
+			if (move == null) move = 1;
+			console.log(`Offset message: `);
+			console.log(msg);
 			var output = "";
 			for (var i = 0; i < msg.length; i++) {
-				output += String.fromCharCode(
-					msg.charCodeAt(i) + parseInt(eval(move.replace("chr", i)))
-				);
+				output += String.fromCharCode(msg.charCodeAt(i) + move);
 			}
-			return output;
+			console.log('Offset output: ', output);
+			return [output];
 		},
 		decode: (msg, move) => {
 			var output = "";
@@ -60,7 +65,12 @@ var codecs = [
 	},
 	{
 		name: 'setOutput',
-		encode: () => { },
+		encode: (msg) => { console.log(msg); outputText.innerText = msg; },
+		decode: () => { }
+	},
+	{
+		name: 'getInput',
+		encode: () => { console.log('Input text is ' + inputText.innerText); return [inputText.innerText]; },
 		decode: () => { }
 	}
 
