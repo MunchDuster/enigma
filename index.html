@@ -7,23 +7,57 @@
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-	Input<div class="bigBoxWords" oninput="resizeme(this);" spellcheck="false" contentEditable="true" id="letxt">hi</div><br>
+	<div style="display: inline-block; float: left; width:80%; height: 100%;">
+		<h2>Main</h2>
 
-	<button onclick="encode();">Encrypt</button>
-	<button onclick="decode();">Decrypt</button>
-	<button onclick="cleartxt();">Clear Output</button>
-	<button onclick="swap();">Swap</button>
-	<button onclick="saveset();">Save Setup</button>
-	<button onclick="copyText();">Copy Output</button>
-	<br>
 
-	Offset:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="ofsefs" funcs="offset.js">0</div><br>
-	Mltply:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="fikdqe" funcs="multiplier.js">1</div><br>
-	Rotate:<div spellcheck="false" contentEditable="true" class="coder smallBoxWords" id="mbdgdz" funcs="rotate.js">0</div><br>
+		Input
+		<div class="BigInput InputText" oninput="resizeme(this);" spellcheck="false" contentEditable="true" id="input">wassup ma dude</div>
+
+		
+
+		
+		Encryption
+		<div class="canvas">
+			<div class="ModulesInput DraggableItem" data-function="getInput" data-placeIn="canvas">
+				Input text
+				<div class="Output Port"></div>
+			</div>
+
+			<div class="ModulesOutput DraggableItem" data-function="setOutput" data-placeIn="canvas">
+				<div class="Input Port"></div>
+				Output text
+			</div>
+		</div>
+
+
+		<!-- Buttons -->
+		<button onclick="encode();">Encode</button>
+		<br>
+
+
+
+		Output<div class="BigInput OutputText"> oninput="resizeme(this);" id="outpt"></div>
+		
+	</div>
+	<div style="display: inline-block; float: left; width: 20%; height: 100%; background-color:rgb(241, 241, 241); ">
+		<h2>Addons</h2>
+		<div class="DraggableItem" data-placeIn="canvas">
+			<div class="Input Port"></div>
+			Add
+			<div class="Output Port"></div>
+		</div>
+	</div>
+
 	
-	Output<div class="bigBoxWords" oninput="resizeme(this);" id="outpt"></div><br>
- 
-	<p id="scrcont"></p>
+
+
+	<script src="codecs.js"></script>
+	<script src="ports.js"></script>
+	<script src="modules.js"></script>
+	<script src="draggable.js"></script>
+	<script src="encryption.js"></script>
+	
 	<script src="script.js"></script>
 <body>
 <html>
