@@ -5,17 +5,6 @@ var dragItem, dragOffsetX, dragOffsetY;
 var mousemoveListener, mouseupListener;
 
 canvas.addEventListener('mouseenter', mousedown);
-canvas.addEventListener('mouseup', (e) => {
-	if (dragItem != null) {
-		var hoverItem = getClickItem(e);
-		if (hoverItem != null && hoverItem.type == 'port') {
-			console.log(port);
-			hoverPort.connection = port;
-			port.connection = hoverPort;
-		}
-	}
-});
-canvas.addEventListener('mousemove',)
 
 function mousedown(e) {
 	dragItem = getClickItem(e);
@@ -35,6 +24,11 @@ function mousemove(e) {
 function mouseup(e) {
 	if (dragItem != null) {
 		//connect port if dragged a port onto another port
+		var hoverItem = getClickItem(e);
+		if (hoverItem != null && hoverItem.class == 'port') {
+			console.log(port);
+			CreateConnection(hoverItem, dragItem.port);
+		}
 
 		//remove listeners
 		mousemoveListener = canvas.removeEventListener('mousemove', mousemove);
@@ -133,7 +127,7 @@ function getClickItem(e) {
 			return false;
 		}
 	}
-	function pointIsOnInputPort(module) {
+	function pointIsOnPort(port) {
 		for (var i = 0; i < module.inputs.length; i++) {
 			var port = module.inputs[i],
 				portx = port.x + module.x,
@@ -147,44 +141,41 @@ function getClickItem(e) {
 		}
 		return null;
 	}
-	function pointIsOnOutputPort(module) {
-		for (var i = 0; i < module.outputs.length; i++) {
-			var port = module.outputs[i],
-				portx = port.x + module.x,
-				porty = port.y + module.y,
-				distance = Math.sqrt(portx * port.x + porty * port.y);
+	function pointIsOnConnection(connection) {
+		function pointIsInBoundingBox
+		for (var i = 0; i < connections.length; i++) {
+			var connection = connections[i];
+			//check if click point is in bounding box
+			if (pointIsInBoundingBox(connection)) {
 
-			//check if clicked on port.
-			if (distance <= 3) {
-				return createPortDrag(port);
 			}
-		}
-		return null;
-	}
 
+			//check if click point is on line
+		}
+	}
+	//find if clicked on port
+	for (var i = 0; i < ports.length; i++) {
+		var port = ports[i];
+
+		if (pointIsOnPort())
+	}
+	//find if click on connection
+	for (var i = 0; i < connections.length; i++) {
+		var connection = connections[i];
+
+		if (pointIsOnConnection(connection)) {
+			return connection;
+		}
+	}
 	//find if clicked on any module
 	for (var i = 0; i < modules.length; i++) {
 		var module = modules[i];
 
 		if (pointIsOnModule(module)) {
-			//check if clicked on input port in module
-			var inputport = pointIsOnInputPort(module);
-			if (inputport != null) return inputport;
-
-			//check if clicked on output port in module
-			var outputport = pointIsOnOutputPort(module);
-			if (outputport != null) return outputport;
-
 			//not hovering over any port, return module
 			return module;
 		}
 	}
-	//find if clicked on any connection
-	for (var i = 0; i < connections.length; i++) {
-		var line = connections[i];
-		//check if mouse is on line.
-
-	});
 
 }
 function dragItem(item, e) {

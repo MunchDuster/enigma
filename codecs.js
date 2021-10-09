@@ -28,8 +28,8 @@ var codecs = {
 		}
 	},
 	'rotate': {
-		inputs: 2,
-		outputs: 2,
+		inputs: ['string', 'number'],
+		outputs: ['string'],
 		encode: (msg, move) => {
 			var output = "";
 			for (var i = 0; i < msg.length; i++) {
@@ -50,6 +50,8 @@ var codecs = {
 		}
 	},
 	'multiply': {
+		inputs: ['string', 'number'],
+		outputs: ['string'],
 		encode: (msg, move) => {
 			var output = "";
 			for (var i = 0; i < msg.length; i++) {
@@ -66,6 +68,8 @@ var codecs = {
 		}
 	},
 	'output': {
+		inputs: ['string'],
+		outputs: [],
 		encode: (msg) => {
 			console.log(msg);
 			outputText.innerText = msg;
@@ -73,6 +77,8 @@ var codecs = {
 		decode: () => { }
 	},
 	'input': {
+		inputs: ['string'],
+		outputs: ['string'],
 		encode: (empty) => {
 			console.log('Input text is ' + inputText.innerText);
 			return [inputText.innerText];
