@@ -1,6 +1,3 @@
-const inputText = document.querySelector('.ModulesInput');
-const outputModule = document.querySelector('.ModulesOutput');
-
 function cleartxt() {
 	outputText.innerText = "";
 }

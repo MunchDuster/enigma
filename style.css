@@ -1,4 +1,3 @@
-.canvas,
 .BigInput {
   overflow-wrap: break-word;
   height: 200px;
@@ -12,7 +11,7 @@
   font-family: "JetBrains Mono";
   padding: 5px 10px;
 }
-.canvas,
+canvas,
 .SmallInput,
 .BigInput {
   overflow: hidden;
@@ -23,6 +22,10 @@
   vertical-align: top;
   margin: 3px;
   background-color: rgb(238, 238, 238);
+}
+
+canvas {
+  display: block;
 }
 .Line {
   background-color: rgb(255, 128, 128);

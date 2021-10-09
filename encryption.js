@@ -1,7 +1,6 @@
 function encode() {
 	console.log('encoding');
-	var startModule = getModuleFromElement(inputText);
-	var currentModules = [startModule];
+	var currentModules = [modules[0]];
 
 	while (currentModules.length > 0) {
 		var nextModules = [];

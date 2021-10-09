@@ -1,51 +1,42 @@
 const modules = [];
 
 function CreateModule(name) {
-	function calculateHeight(numberOfINputs, outputs) {
-		return Math.max(inputs, outputs)
+	function calculateHeight(inputs, outputs) {
+		return Math.max(inputs, outputs) * 20 + 20;
 	}
-	var height = calculateHeight(codecs[name].inputs.length);
+	var height = calculateHeight(codecs[name].inputs.length, codecs[name].outputs.length);
 	//Set base object
 	var obj = {
 		class: 'module',
-		x: 0,
-		y: 0,
+		x: canvas.width / 2,
+		y: canvas.height / 2,
 		inputs: [],
 		outputs: [],
-		height: 40,
+		height: height,
 		width: 100,
-		name: name
+		name: name,
 	};
 
 	function makeInputs() {
 		// Get and return all inputs on element
-		var inputEles = Array.from(element.getElementsByClassName('Input'));
-		console.log(`There are ${inputEles.length} inputs`);
-		var inputs = [];
-		inputEles.forEach((ele) => {
-			var port = CreatePort(ele, obj);
-			portElement(port, obj);
-			inputs.push(port);
-		});
+		var inputs = codecs[name].inputs;
 
-		return inputs;
+		for (var i = 0; i < inputs.length; i++) {
+			var port = CreatePort(obj, true, i);
+			obj.inputs.push(port);
+		}
 	}
 	function makeOutputs() {
 		//Get and return all outputs on element
-		var outputEles = Array.from(element.getElementsByClassName('Output'));
-		var outputs = [];
-		outputEles.forEach((ele) => {
-			var port = CreatePort(ele, obj);
-			console.log(port);
-			portElement(port, obj);
-			outputs.push(port);
-
-		});
-		return outputs;
+		var outputs = codecs[name].outputs;
+		for (var i = 0; i < outputs.length; i++) {
+			var port = CreatePort(obj, false, i);
+			obj.outputs.push(port);
+		}
 	}
 
-	obj.inputs = getInputs();
-	obj.outputs = getOutputs();
+	makeInputs();
+	makeOutputs();
 
 	modules.push(obj);
 	return obj;
