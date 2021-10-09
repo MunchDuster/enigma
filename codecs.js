@@ -4,7 +4,7 @@ const outputText = document.querySelector('.OutputText');
 var codecs = {
 	'offset': {
 		inputs: ['string', 'number'],
-		outputs: ['text'],
+		outputs: ['string'],
 
 		encode: ([msg, move]) => {
 			if (move == null) move = 1;
@@ -79,7 +79,7 @@ var codecs = {
 	'input': {
 		inputs: [],
 		outputs: ['string'],
-		encode: (empty) => {
+		encode: () => {
 			console.log('Input text is ' + inputText.innerText);
 			return [inputText.innerText];
 		},

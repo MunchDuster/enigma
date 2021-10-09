@@ -39,6 +39,7 @@ function CreateModule(name) {
 	makeOutputs();
 
 	modules.push(obj);
+	renderCanvas();
 	return obj;
 }
 function DeleteModule(module) {

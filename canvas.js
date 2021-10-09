@@ -1,14 +1,20 @@
 //Shape settings
 var connectionThickness = 5,
-	portRadius = 5;
+	portRadius = 5,
+	fontSize = 22;
 
 //Colors
 var colors = {
 	module_bg: '#cfcfcf',
 	module_text: '#000000',
-	port: '#ff0000',
-	line_temp: '#ff8080',
-	line_set: '#ff0000'
+	port_set: {
+		'string': '#0000ff',
+		'number': '#ff0000'
+	},
+	port_temp: {
+		'string': '#8080ff',
+		'number': '#ff8080'
+	}
 };
 
 
@@ -42,17 +48,18 @@ function mouseup(e) {
 		//connect port if dragged a port onto another port
 		console.log('Find mouse up hover');
 		var hoverItem = getClickItem(e);
-		if (hoverItem != null && hoverItem.class == 'port drag') {
-			console.log('Hovered over port')
+		if (hoverItem != null && hoverItem.class == 'port drag' && hoverItem.port.type == dragItem.port.type) {
+			console.log('Connection created');
 			CreateConnection(hoverItem.port, dragItem.port);
 		} else {
 			dragItem = null;
-			renderCanvas();
 		}
 
 		//remove listeners
 		mousemoveListener = canvas.removeEventListener('mousemove', mousemove);
 		mouseupListener = canvas.removeEventListener('mouseup', mouseup);
+
+		renderCanvas();
 	}
 }
 
@@ -77,7 +84,6 @@ function renderCanvas(e) {
 			y1 = module.y + module.height;
 
 		//draw module box
-
 		ctx.beginPath();
 		ctx.fillStyle = colors.module_bg;
 		ctx.moveTo(x0, y0);
@@ -87,51 +93,42 @@ function renderCanvas(e) {
 		ctx.fill();
 
 		//draw module label
-
 		ctx.beginPath();
 		ctx.fillStyle = '#000000';
-		ctx.font = "25px Arial";
-		ctx.fillText(module.name, x0 + 20, y1 - 10);
+		ctx.font = fontSize + "px Arial";
+		ctx.fillText(module.name, x0 + 20, lerp(y0, y1, 0.5) + fontSize / 3);
+	}
 
+	//draw ports
+	for (var i = 0; i < ports.length; i++) {
+		var port = ports[i],
+			x = port.x + port.module.x,
+			y = port.y + port.module.y;
 
-		//draw module input ports
 		ctx.beginPath();
-		ctx.lineWidth = connectionThickness;
-		ctx.fillStyle = colors.port;
-		for (var j = 0; j < module.inputs.length; j++) {
-			var x = module.inputs[j].x + module.x,
-				y = module.inputs[j].y + module.y;
-			ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
-			ctx.fill();
-		}
-
-		//draw module output ports
-		for (var j = 0; j < module.outputs.length; j++) {
-			var x = module.outputs[j].x + module.x,
-				y = module.outputs[j].y + module.y;
-
-			ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
-			ctx.fill();
-		}
-
-
+		ctx.fillStyle = colors.port_set[port.type];
+		ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
+		ctx.fill();
 	}
 
 
 	//draw connections
-	ctx.beginPath();
-	ctx.strokeStyle = colors.line_set;
-	console.log(`There are ${connections.length} connections`);
+	ctx.lineWidth = connectionThickness;
 	for (var i = 0; i < connections.length; i++) {
 		var port1 = connections[i].port1, port2 = connections[i].port2;
 		//render line
+		ctx.beginPath();
+		ctx.strokeStyle = colors.port_set[port1.type];
 		ctx.moveTo(port1.x + port1.module.x, port1.y + port1.module.y,);
 		ctx.lineTo(port2.x + port2.module.x, port2.y + port2.module.y,);
 		ctx.stroke();
 	}
 
 	//draw the dragObject (if its a maybe connection)
-	if (dragItem != null && dragItem.render != null) dragItem.render(ctx, e);
+
+	if (dragItem != null && dragItem.render != null && e != null) {
+		dragItem.render(ctx, e);
+	}
 }
 function getClickItem(e) {
 	var x = e.offsetX,
@@ -144,24 +141,13 @@ function getClickItem(e) {
 			x: e.offsetX,
 			y: e.offsetY,
 			port: port,
-			render: (ctx, e) => {
+			render: function (ctx, e) {
 				//render line
-				ctx.strokeStyle = colors.line_temp;
+				ctx.strokeStyle = colors.port_temp[this.port.type];
 				ctx.moveTo(port.x + port.module.x, port.y + port.module.y,);
 				ctx.lineTo(e.offsetX, e.offsetY);
 				ctx.stroke();
 			},
-			mouseup: (e) => {
-				for (var i = 0; i < ports.length; i++) {
-					var port2 = ports[i];
-
-					if (pointIsOnPort(port) && port != port2) {
-						CreateConnection(port, port2);
-						return;
-					}
-				}
-				renderCanvas();
-			}
 		};
 
 		return obj;
