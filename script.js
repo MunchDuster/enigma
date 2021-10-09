@@ -3,7 +3,6 @@ const scriptContainer = document.getElementById("scrcont");
 const outpt = document.getElementById("outpt");
 
 var lastIns = [];
-var codecs;
 function cleartxt() {
 	outpt.innerText = "";
 }
@@ -58,6 +57,9 @@ async function copyText() {
 
 	/* Alert the copied text */
 }
+
+
+
 //try to load saved setup
 try {
 	var savedInput = localStorage.getItem("input");

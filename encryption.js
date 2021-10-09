@@ -1,11 +1,6 @@
-const inputModule = document.querySelector('.ModulesInput');
-const outputModule = document.querySelector('.ModulesOutput');
-
-
 function encode() {
 	console.log('encoding');
-	var startModule = getModuleFromElement(inputModule);
-	var endModule = getModuleFromElement(outputModule);
+	var startModule = getModuleFromElement(inputText);
 	var currentModules = [startModule];
 
 	while (currentModules.length > 0) {

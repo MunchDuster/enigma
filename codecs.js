@@ -1,9 +1,11 @@
 const inputText = document.querySelector('.InputText');
 const outputText = document.querySelector('.OutputText');
 
-var codecs = [
-	{
-		name: 'offset',
+var codecs = {
+	'offset': {
+		inputs: ['string', 'number'],
+		outputs: ['text'],
+
 		encode: ([msg, move]) => {
 			if (move == null) move = 1;
 			console.log(`Offset message: `);
@@ -25,8 +27,9 @@ var codecs = [
 			return output;
 		}
 	},
-	{
-		name: 'rotate',
+	'rotate': {
+		inputs: 2,
+		outputs: 2,
 		encode: (msg, move) => {
 			var output = "";
 			for (var i = 0; i < msg.length; i++) {
@@ -46,8 +49,7 @@ var codecs = [
 			return output;
 		}
 	},
-	{
-		name: 'multiply',
+	'multiply': {
 		encode: (msg, move) => {
 			var output = "";
 			for (var i = 0; i < msg.length; i++) {
@@ -63,28 +65,18 @@ var codecs = [
 			return output;
 		}
 	},
-	{
-		name: 'setOutput',
-		encode: (msg) => { console.log(msg); outputText.innerText = msg; },
+	'output': {
+		encode: (msg) => {
+			console.log(msg);
+			outputText.innerText = msg;
+		},
 		decode: () => { }
 	},
-	{
-		name: 'getInput',
-		encode: () => { console.log('Input text is ' + inputText.innerText); return [inputText.innerText]; },
+	'input': {
+		encode: (empty) => {
+			console.log('Input text is ' + inputText.innerText);
+			return [inputText.innerText];
+		},
 		decode: () => { }
 	}
-
-
-];
-
-
-function getCodecFromName(name) {
-	for (var i = 0; i < codecs.length; i++) {
-		if (codecs[i].name == name) {
-			console.log("codec found");
-			return codecs[i];
-		}
-	}
-	console.log("No codec found: " + name);
-	return null;
-}
+};

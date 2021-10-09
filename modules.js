@@ -1,42 +1,41 @@
-var modules = [];
+const modules = [];
 
-var moduleEles = Array.from(document.querySelectorAll('.DraggableItem'));
-moduleEles.forEach((ele) => {
-	createModule(ele);
-});
-
-function createModule(element) {
+function CreateModule(name) {
+	function calculateHeight(numberOfINputs, outputs) {
+		return Math.max(inputs, outputs)
+	}
+	var height = calculateHeight(codecs[name].inputs.length);
 	//Set base object
 	var obj = {
-		element: element,
+		class: 'module',
+		x: 0,
+		y: 0,
 		inputs: [],
 		outputs: [],
-		name: element.dataset.function
+		height: 40,
+		width: 100,
+		name: name
 	};
 
-	function getInputs() {
+	function makeInputs() {
 		// Get and return all inputs on element
 		var inputEles = Array.from(element.getElementsByClassName('Input'));
 		console.log(`There are ${inputEles.length} inputs`);
 		var inputs = [];
 		inputEles.forEach((ele) => {
 			var port = CreatePort(ele, obj);
-			console.log('input port is: ');
-			console.log(port);
 			portElement(port, obj);
 			inputs.push(port);
 		});
 
 		return inputs;
 	}
-	function getOutputs() {
+	function makeOutputs() {
 		//Get and return all outputs on element
 		var outputEles = Array.from(element.getElementsByClassName('Output'));
-		console.log(`There are ${outputEles.length} outputs`);
 		var outputs = [];
 		outputEles.forEach((ele) => {
 			var port = CreatePort(ele, obj);
-			console.log('output port is: ');
 			console.log(port);
 			portElement(port, obj);
 			outputs.push(port);
@@ -51,17 +50,11 @@ function createModule(element) {
 	modules.push(obj);
 	return obj;
 }
-function getModuleFromElement(element) {
-
-	for (var i = 0; i < modules.length; i++) {
-		var module = modules[i];
-		if (module.element == element) {
-			console.log('Module found');
-			return module;
-		}
+function DeleteModule(module) {
+	var index = modules.indexOf(module);
+	if (index !== -1) {
+		modules.splice(index, 1);
+	} else {
+		console.log(`Module doesnt exist: ${module}`);
 	}
-	console.log('No module found');
-	return null;
 }
-
-
