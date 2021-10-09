@@ -3,12 +3,14 @@ const connections = [];
 function CreateConnection(port1, port2) {
 	var obj = {
 		class: 'connection',
-		port2: port1,
+		port1: port1,
 		port2: port2
 	};
 
 	port1.connection = port2;
 	port2.connection = port1;
+
+	connections.push(obj);
 
 	return obj;
 }

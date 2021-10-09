@@ -1,5 +1,5 @@
 //Shape settings
-var connectionThickness = 3,
+var connectionThickness = 5,
 	portRadius = 5;
 
 //Colors
@@ -8,7 +8,7 @@ var colors = {
 	module_text: '#000000',
 	port: '#ff0000',
 	line_temp: '#ff8080',
-	line_set: '%ff0000'
+	line_set: '#ff0000'
 };
 
 
@@ -21,8 +21,9 @@ var mousemoveListener, mouseupListener;
 canvas.addEventListener('mousedown', mousedown);
 
 function mousedown(e) {
-	console.log('mousedown');
 	dragItem = getClickItem(e);
+	console.log('mousedown');
+	console.log(dragItem);
 	if (dragItem != null) {
 		//set the offset
 		dragOffsetX = e.offsetX - dragItem.x;
@@ -33,18 +34,20 @@ function mousedown(e) {
 	}
 }
 function mousemove(e) {
-	console.log('mousemove');
-
 	renderCanvas(e);
 	if (dragItem != null) updateDragItem(dragItem, e);
 }
 function mouseup(e) {
 	if (dragItem != null) {
 		//connect port if dragged a port onto another port
+		console.log('Find mouse up hover');
 		var hoverItem = getClickItem(e);
-		if (hoverItem != null && hoverItem.class == 'port') {
-			console.log(port);
-			CreateConnection(hoverItem, dragItem.port);
+		if (hoverItem != null && hoverItem.class == 'port drag') {
+			console.log('Hovered over port')
+			CreateConnection(hoverItem.port, dragItem.port);
+		} else {
+			dragItem = null;
+			renderCanvas();
 		}
 
 		//remove listeners
@@ -64,11 +67,9 @@ function renderCanvas(e) {
 		return a + (b - a) * c;
 	}
 
-	//draw modules and set connections
-	console.log('there are ' + modules.length + ' modules');
+	//draw modules
 	for (var i = 0; i < modules.length; i++) {
 		var module = modules[i];
-
 		//get the module display corners
 		var x0 = module.x,
 			y0 = module.y,
@@ -95,18 +96,19 @@ function renderCanvas(e) {
 
 		//draw module input ports
 		ctx.beginPath();
+		ctx.lineWidth = connectionThickness;
 		ctx.fillStyle = colors.port;
-		for (var i = 0; i < module.inputs.length; i++) {
-			var x = module.inputs[i].x + module.x,
-				y = module.inputs[i].y + module.y;
+		for (var j = 0; j < module.inputs.length; j++) {
+			var x = module.inputs[j].x + module.x,
+				y = module.inputs[j].y + module.y;
 			ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
 			ctx.fill();
 		}
 
 		//draw module output ports
-		for (var i = 0; i < module.outputs.length; i++) {
-			var x = module.outputs[i].x + module.x,
-				y = module.outputs[i].y + module.y;
+		for (var j = 0; j < module.outputs.length; j++) {
+			var x = module.outputs[j].x + module.x,
+				y = module.outputs[j].y + module.y;
 
 			ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
 			ctx.fill();
@@ -118,9 +120,14 @@ function renderCanvas(e) {
 
 	//draw connections
 	ctx.beginPath();
-	ctx.fillStyle = colors.line_set;
+	ctx.strokeStyle = colors.line_set;
+	console.log(`There are ${connections.length} connections`);
 	for (var i = 0; i < connections.length; i++) {
-
+		var port1 = connections[i].port1, port2 = connections[i].port2;
+		//render line
+		ctx.moveTo(port1.x + port1.module.x, port1.y + port1.module.y,);
+		ctx.lineTo(port2.x + port2.module.x, port2.y + port2.module.y,);
+		ctx.stroke();
 	}
 
 	//draw the dragObject (if its a maybe connection)
@@ -133,15 +140,27 @@ function getClickItem(e) {
 	//function used to create an item to drag to make a port connection
 	function createPortDrag(port) {
 		var obj = {
+			class: 'port drag',
 			x: e.offsetX,
 			y: e.offsetY,
 			port: port,
 			render: (ctx, e) => {
 				//render line
 				ctx.strokeStyle = colors.line_temp;
-				ctx.moveTo(port.x, port.y);
+				ctx.moveTo(port.x + port.module.x, port.y + port.module.y,);
 				ctx.lineTo(e.offsetX, e.offsetY);
 				ctx.stroke();
+			},
+			mouseup: (e) => {
+				for (var i = 0; i < ports.length; i++) {
+					var port2 = ports[i];
+
+					if (pointIsOnPort(port) && port != port2) {
+						CreateConnection(port, port2);
+						return;
+					}
+				}
+				renderCanvas();
 			}
 		};
 
@@ -161,18 +180,19 @@ function getClickItem(e) {
 		}
 	}
 	function pointIsOnPort(port) {
-		for (var i = 0; i < module.inputs.length; i++) {
-			var port = module.inputs[i],
-				portx = port.x + module.x,
-				porty = port.y + module.y,
-				distance = Math.sqrt(portx * port.x + porty * port.y);
+		var portx = port.x + port.module.x,
+			porty = port.y + port.module.y,
+			distx = x - portx,
+			disty = y - porty,
+			distance = Math.sqrt(distx * distx + disty * disty);
 
-			//check if clicked on port.
-			if (distance <= portRadius) {
-				return true;
-			}
+		//check if clicked on port.
+		if (distance <= portRadius) {
+			return true;
+		} else {
+			return false;
 		}
-		return false;
+
 	}
 	function pointIsOnConnection(connection) {
 		var x0 = connection.port1.x,
@@ -214,10 +234,11 @@ function getClickItem(e) {
 		}
 	}
 	//find if clicked on a port
+	console.log(`There are ${ports.length} ports`);
 	for (var i = 0; i < ports.length; i++) {
 		var port = ports[i];
 
-		if (pointIsOnPort()) {
+		if (pointIsOnPort(port)) {
 			return createPortDrag(port);
 		}
 	}

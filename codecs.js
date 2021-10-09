@@ -77,7 +77,7 @@ var codecs = {
 		decode: () => { }
 	},
 	'input': {
-		inputs: ['string'],
+		inputs: [],
 		outputs: ['string'],
 		encode: (empty) => {
 			console.log('Input text is ' + inputText.innerText);

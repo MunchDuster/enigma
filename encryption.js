@@ -18,7 +18,7 @@ function encode() {
 				inputValues.push(module.inputs[j].value);
 			}
 			console.log('Input values: ', inputValues);
-			var outputValues = getCodecFromName(module.name).encode(inputValues);
+			var outputValues = codecs[module.name].encode(inputValues);
 			console.log(module);
 
 			if (outputValues == null) {

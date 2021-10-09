@@ -8,8 +8,8 @@ function CreateModule(name) {
 	//Set base object
 	var obj = {
 		class: 'module',
-		x: canvas.width / 2,
-		y: canvas.height / 2,
+		x: canvas.width / 2 + Math.random() * 100,
+		y: canvas.height / 2 + Math.random() * 100,
 		inputs: [],
 		outputs: [],
 		height: height,
@@ -22,7 +22,7 @@ function CreateModule(name) {
 		var inputs = codecs[name].inputs;
 
 		for (var i = 0; i < inputs.length; i++) {
-			var port = CreatePort(obj, true, i);
+			var port = CreatePort(obj, true, i, inputs[i]);
 			obj.inputs.push(port);
 		}
 	}
@@ -30,7 +30,7 @@ function CreateModule(name) {
 		//Get and return all outputs on element
 		var outputs = codecs[name].outputs;
 		for (var i = 0; i < outputs.length; i++) {
-			var port = CreatePort(obj, false, i);
+			var port = CreatePort(obj, false, i, outputs[i]);
 			obj.outputs.push(port);
 		}
 	}
