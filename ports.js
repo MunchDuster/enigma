@@ -1,5 +1,5 @@
 const ports = [];
-function CreatePort(module, isInput, place, type) {
+function CreatePort(module, isInput, place, type, codecData) {
 	var x = isInput ? 8 : module.width - 8,
 		y = module.height / (place + 2),
 		obj = {
@@ -10,6 +10,7 @@ function CreatePort(module, isInput, place, type) {
 			direction: isInput ? 'input' : 'output',
 			type: type,
 			connection: null,
+			codecData: codecData
 		};
 
 	ports.push(obj);

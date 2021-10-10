@@ -11,10 +11,21 @@
   font-family: "JetBrains Mono";
   padding: 5px 10px;
 }
+.Sidebar {
+  display: inline-block;
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 20%;
+  height: 100%;
+  background-color: rgb(241, 241, 241);
+}
 canvas,
 .SmallInput,
 .BigInput {
   overflow: hidden;
+  height: fit-content;
+  min-height: 30px;
   border-radius: 10px;
   resize: none;
   border: 2px solid grey;

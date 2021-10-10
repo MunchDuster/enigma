@@ -46,10 +46,8 @@ function mousemove(e) {
 function mouseup(e) {
 	if (dragItem != null) {
 		//connect port if dragged a port onto another port
-		console.log('Find mouse up hover');
 		var hoverItem = getClickItem(e);
 		if (hoverItem != null && hoverItem.class == 'port drag' && hoverItem.port.type == dragItem.port.type) {
-			console.log('Connection created');
 			CreateConnection(hoverItem.port, dragItem.port);
 		} else {
 			dragItem = null;
@@ -96,7 +94,7 @@ function renderCanvas(e) {
 		ctx.beginPath();
 		ctx.fillStyle = '#000000';
 		ctx.font = fontSize + "px Arial";
-		ctx.fillText(module.name, x0 + 20, lerp(y0, y1, 0.5) + fontSize / 3);
+		ctx.fillText(module.codec.getName(), x0 + 20, lerp(y0, y1, 0.5) + fontSize / 3);
 	}
 
 	//draw ports
@@ -220,7 +218,6 @@ function getClickItem(e) {
 		}
 	}
 	//find if clicked on a port
-	console.log(`There are ${ports.length} ports`);
 	for (var i = 0; i < ports.length; i++) {
 		var port = ports[i];
 

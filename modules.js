@@ -1,6 +1,6 @@
 const modules = [];
 
-function CreateModule(name) {
+function CreateModule(name, codecData) {
 	function calculateHeight(inputs, outputs) {
 		return Math.max(inputs, outputs) * 20 + 20;
 	}
@@ -10,6 +10,7 @@ function CreateModule(name) {
 		class: 'module',
 		x: canvas.width / 2 + Math.random() * 100,
 		y: canvas.height / 2 + Math.random() * 100,
+		codec: codecs[name].create(codecData),
 		inputs: [],
 		outputs: [],
 		height: height,

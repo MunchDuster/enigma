@@ -11,11 +11,12 @@
 		<h2>Main</h2>
 
 		Input
-		<div class="BigInput InputText" oninput="resizeme(this);" spellcheck="false" contentEditable="true" id="input">wassup ma dude</div>
+		<div class="BigInput InputText" spellcheck="false" contentEditable="true" id="input">wassup ma dude</div>
 		
 		Encryption
 		<canvas height="350px" width="800px" ></canvas>
 
+		<div class="VariableParent"></div>
 		<!-- Buttons -->
 		<button onclick="encode();">Encode</button>
 		<br>
@@ -25,9 +26,12 @@
 		<div class="BigInput OutputText"></div>
 		
 	</div>
-	<div style="display: inline-block; position:fixed; right: 0; top: 0;width: 20%; height: 100%; background-color:rgb(241, 241, 241); ">
+	<div class="Sidebar">
 		<h2>Modifiers</h2>
 		<button onclick="CreateModule('offset');">Offset</button>
+		<button onclick="CreateModule('multiply');">Multiply</button>
+		<button onclick="CreateModule('rotate');">Rotate</button>
+		<button onclick="CreateModule('variable', 'number');">Number var</button>
 	</div>
 
 	
