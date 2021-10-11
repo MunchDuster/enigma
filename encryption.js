@@ -9,13 +9,11 @@ function encode() {
 		}
 	}
 	function getInputModules(module, order) {
-		console.log(`order is ${order}`);
 		//put into modules list
 		addToModulesOrder(module, order);
 		//increment order counter
 		order++;
 		//got to the inputs
-		console.log(`There are ${module.inputs.length} inputs.`);
 		for (var i = 0; i < module.inputs.length; i++) {
 			if (module.inputs[i].connection != null) {
 				var connectedModule = module.inputs[i].connection.module;
@@ -33,7 +31,6 @@ function encode() {
 	//now use them in correct order
 	for (var i = modulesOrder.length - 1; i >= 0; i--) {
 		var module = modulesOrder[i];
-		console.log(`Module ${i} is`);
 
 		//get the inputs values
 		var inputValues = [];
@@ -62,5 +59,4 @@ function encode() {
 			module.outputs[j].value = outputValues[j];
 		}
 	}
-
 }

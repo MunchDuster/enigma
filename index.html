@@ -1,46 +1,57 @@
 <html>
-<head>
-	<title>Enigma</title>
-	<link rel="shortcut icon" type="image/png" href="mememan.png"/>
-	<link rel="stylesheet" href="style.css">
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
-</head>
-<body>
-	<div style="display: inline-block; float: left; width:80%; height: 100%;">
-		<h2>Main</h2>
+	<head>
+		<title>Enigma</title>
+		<link rel="shortcut icon" type="image/png" href="mememan.png"/>
+		<link rel="stylesheet" href="style.css">
+		<link rel="preconnect" href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<div class="MainBar">
+			<h2>Main</h2>
 
-		Input
-		<div class="BigInput InputText" spellcheck="false" contentEditable="true" id="input">wassup ma dude</div>
-		
-		Encryption
-		<canvas height="350px" width="800px" ></canvas>
+			Input
+			<div class="BigBox InputText" spellcheck="false" contentEditable="true" id="input">wassup ma dude</div>
+			
+			<!-- Buttons -->
+			<button onclick="encode();">Encode</button>
+			<button onclick="save();">Save</button>
+			<button onclick="decode();">Decode</button>
+			<br>
 
-		<div class="VariableParent"></div>
-		<!-- Buttons -->
-		<button onclick="encode();">Encode</button>
-		<br>
-		
+			Encryption
+			<canvas></canvas>
 
-		Output
-		<div class="BigInput OutputText"></div>
-		
-	</div>
-	<div class="Sidebar">
-		<h2>Modifiers</h2>
-		<button onclick="CreateModule('offset');">Offset</button>
-		<button onclick="CreateModule('multiply');">Multiply</button>
-		<button onclick="CreateModule('rotate');">Rotate</button>
-		<button onclick="CreateModule('variable', 'number');">Number var</button>
-	</div>
+			Output
+			<div class="BigBox OutputText"></div>
+			
+		</div>
+		<div class="Sidebar">
+			<div>
+				<h3>Modifiers</h3>
+				<button onclick="CreateModule('offset');">Offset</button>
+				<button onclick="CreateModule('multiply');">Multiply</button>
+				<button onclick="CreateModule('rotate');">Rotate</button>
+				<button onclick="CreateModule('variable', 'number');">Number var</button>
+				<button onclick="CreateModule('random', 'string');">Random number var</button>
+			</div>
+			<div class="VariableParent">
+				<h3>Variables</h3>
+			</div>
+		</div>
 
-	
-	<script src="codecs.js"></script>
-	<script src="buttons.js"></script>
-	<script src="ports.js"></script>
-	<script src="connections.js"></script>
-	<script src="modules.js"></script>
-	<script src="encryption.js"></script>
-	<script src="canvas.js"></script>
-<body>
-<html>
+
+			<div class="footer">
+				Noise provided by <a style="color: rgb(199, 199, 199);" href="https://github.com/davidbau">David Bau</a>
+			</div>
+
+		<script src="random.js"></script>
+		<script src="codecs.js"></script>
+		<script src="ports.js"></script>
+		<script src="connections.js"></script>
+		<script src="modules.js"></script>
+		<script src="encryption.js"></script>
+		<script src="canvas.js"></script>
+		<script src="buttons.js"></script>
+	</body>
+</html>

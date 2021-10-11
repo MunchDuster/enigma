@@ -24,6 +24,7 @@ const ctx = canvas.getContext('2d');
 var dragItem, dragOffsetX, dragOffsetY;
 var mousemoveListener, mouseupListener;
 
+window.addEventListener('resize', resizeCanvas);
 canvas.addEventListener('mousedown', mousedown);
 
 function mousedown(e) {
@@ -31,6 +32,13 @@ function mousedown(e) {
 	console.log('mousedown');
 	console.log(dragItem);
 	if (dragItem != null) {
+		if (dragItem.class == 'connection') {
+			DeleteConnection(dragItem);
+			dragItem = null;
+			renderCanvas();
+			return;
+
+		}
 		//set the offset
 		dragOffsetX = e.offsetX - dragItem.x;
 		dragOffsetY = e.offsetY - dragItem.y;
@@ -47,7 +55,7 @@ function mouseup(e) {
 	if (dragItem != null) {
 		//connect port if dragged a port onto another port
 		var hoverItem = getClickItem(e);
-		if (hoverItem != null && hoverItem.class == 'port drag' && hoverItem.port.type == dragItem.port.type) {
+		if (hoverItem != null && hoverItem.class == 'port drag') {
 			CreateConnection(hoverItem.port, dragItem.port);
 		} else {
 			dragItem = null;
@@ -113,7 +121,7 @@ function renderCanvas(e) {
 	//draw connections
 	ctx.lineWidth = connectionThickness;
 	for (var i = 0; i < connections.length; i++) {
-		var port1 = connections[i].port1, port2 = connections[i].port2;
+		var port1 = connections[i].inputPort, port2 = connections[i].outputPort;
 		//render line
 		ctx.beginPath();
 		ctx.strokeStyle = colors.port_set[port1.type];
@@ -179,43 +187,26 @@ function getClickItem(e) {
 
 	}
 	function pointIsOnConnection(connection) {
-		var x0 = connection.port1.x,
-			y0 = connection.port2.y,
-			x1 = connection.port1.x + connection.port1.module.x,
-			y1 = connection.port2.y + connection.port2.module.y;
+		var x0 = connection.inputPort.x + connection.inputPort.module.x,
+			y0 = connection.inputPort.y + connection.inputPort.module.y,
+			x1 = connection.outputPort.x + connection.outputPort.module.x,
+			y1 = connection.outputPort.y + connection.outputPort.module.y;
 
-		function pointIsInBoundingBox() {
-			if (x < Math.min(x0, x1) && x > Math.max(x0, x1) && y < Math.min(y0, y1) && y > Math.max(y0, y1)) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		function pointIsOnLine() {
-			//based on y = mx + c
+		//based on y = mx + c
 
-			var m = (y1 - y0) / (x1 - x0),
-				c = y0 - m * x0, //c = y - mx
-				calcY = m * x + c,//y = mx + c
-				calcX = (y - c) / m,// x = (y - c) / m
-				distY = y - calcY,
-				distX = x - calcX;
+		var m = (y1 - y0) / (x1 - x0),
+			c = y0 - m * x0, //c = y - mx
+			calcY = m * x + c,//y = mx + c
+			calcX = (y - c) / m,// x = (y - c) / m
+			distY = Math.abs(y - calcY),
+			distX = Math.abs(x - calcX);
 
-			if (Math.min(distY, distX) <= connectionThickness) {
-				return true;
-			} else {
-				return false;
-			}
+		if (Math.min(distY, distX) <= connectionThickness / 2) {
+			return true;
+		} else {
+			return false;
 		}
-		for (var i = 0; i < connections.length; i++) {
-			var connection = connections[i];
-			//check if click point is in bounding box and check if click point is on line
-			if (pointIsInBoundingBox() && pointIsOnLine()) {
-				return true;
-			} else {
-				return false;
-			}
-		}
+
 	}
 	//find if clicked on a port
 	for (var i = 0; i < ports.length; i++) {
@@ -249,10 +240,24 @@ function updateDragItem(item, e) {
 	item.y = e.offsetY - dragOffsetY;
 }
 
-
+function resizeCanvas() {
+	console.log("resize");
+	// ...then set the internal size to match
+	canvas.width = canvas.parentElement.offsetWidth - 14;
+	renderCanvas();
+}
+resizeCanvas();
 
 //Add input and output modules
-CreateModule('input');
-CreateModule('output');
+var inputModule = CreateModule('input');
+inputModule.x = canvas.width / 2 - 200;
+inputModule.y = canvas.height / 2;
 
+var outputModule = CreateModule('output');
+outputModule.x = canvas.width / 2 + 200;
+outputModule.y = canvas.height / 2;
+
+
+
+CreateConnection(inputModule.outputs[0], outputModule.inputs[0]);
 renderCanvas();

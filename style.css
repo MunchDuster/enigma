@@ -1,29 +1,56 @@
+body {
+  overflow-x: hidden;
+}
+.VariableParent {
+  top: 50%;
+  width: 100%;
+  height: 50%;
+  position: absolute;
+  overflow-y: auto;
+}
 .BigInput {
   overflow-wrap: break-word;
   height: 200px;
   width: calc(100% - 20px);
 }
-.SmallInput {
+input,
+.SmallBox {
   height: fit-content;
-  width: 150px;
+  width: 160px;
   display: inline-block;
   font-size: normal;
   font-family: "JetBrains Mono";
   padding: 5px 10px;
 }
+.CanvasParent {
+  resize: vertical;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
 .Sidebar {
   display: inline-block;
-  position: fixed;
+  position: relative;
   right: 0;
   top: 0;
   width: 20%;
   height: 100%;
   background-color: rgb(241, 241, 241);
 }
+h3 {
+  margin: 3px;
+  font-weight: normal;
+  text-decoration: underline;
+  font-size: 20px;
+  font-family: "JetBrains Mono";
+}
 canvas,
-.SmallInput,
-.BigInput {
+.SmallBox,
+input,
+.BigBox {
   overflow: hidden;
+  font-family: "JetBrains Mono";
+  font-size: 1em;
   height: fit-content;
   min-height: 30px;
   border-radius: 10px;
@@ -37,6 +64,7 @@ canvas,
 
 canvas {
   display: block;
+  margin: auto;
 }
 .Line {
   background-color: rgb(255, 128, 128);
@@ -104,4 +132,27 @@ body {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(233, 233, 233);
+}
+
+.even {
+  background-color: #aaaaaa;
+}
+.odd {
+  background-color: #cccccc;
+}
+
+.footer {
+  /* position: absolute; */
+  padding: 4px;
+  bottom: 0px;
+
+  background-color: #333333;
+  color: rgb(241, 241, 241);
+  width: 100%;
+}
+.MainBar {
+  display: inline-block;
+  float: left;
+  width: 80%;
+  height: 100%;
 }

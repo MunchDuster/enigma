@@ -1,16 +1,19 @@
 const modules = [];
 
 function CreateModule(name, codecData) {
+	var codec = codecs[name].new(codecData);
+
 	function calculateHeight(inputs, outputs) {
 		return Math.max(inputs, outputs) * 20 + 20;
 	}
-	var height = calculateHeight(codecs[name].inputs.length, codecs[name].outputs.length);
+	var height = calculateHeight(codec.inputs.length, codec.outputs.length);
 	//Set base object
 	var obj = {
 		class: 'module',
-		x: canvas.width / 2 + Math.random() * 100,
-		y: canvas.height / 2 + Math.random() * 100,
-		codec: codecs[name].create(codecData),
+		x: canvas.width / 2,
+		y: canvas.height / 2,
+		codec: codec,
+		codecData: codecData,
 		inputs: [],
 		outputs: [],
 		height: height,
@@ -20,7 +23,7 @@ function CreateModule(name, codecData) {
 
 	function makeInputs() {
 		// Get and return all inputs on element
-		var inputs = codecs[name].inputs;
+		var inputs = codec.inputs;
 
 		for (var i = 0; i < inputs.length; i++) {
 			var port = CreatePort(obj, true, i, inputs[i]);
@@ -29,7 +32,7 @@ function CreateModule(name, codecData) {
 	}
 	function makeOutputs() {
 		//Get and return all outputs on element
-		var outputs = codecs[name].outputs;
+		var outputs = codec.outputs;
 		for (var i = 0; i < outputs.length; i++) {
 			var port = CreatePort(obj, false, i, outputs[i]);
 			obj.outputs.push(port);
