@@ -17,17 +17,28 @@ var colors = {
 	}
 };
 
-
+//get and prepare the canvas
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
 var dragItem, dragOffsetX, dragOffsetY;
 var mousemoveListener, mouseupListener;
 
+//add mandatory listners
 window.addEventListener('resize', resizeCanvas);
 canvas.addEventListener('mousedown', mousedown);
 
+//prevent the default right click options when right clicking on the canvas
+canvas.addEventListener('contextmenu', function (e) {
+	e.preventDefault();
+}, false);
+
 function mousedown(e) {
+	//cehck for right click
+	if (e.which == 3) {
+		rightclick(e);
+		return;
+	}
 	dragItem = getClickItem(e);
 	console.log('mousedown');
 	console.log(dragItem);
@@ -47,6 +58,48 @@ function mousedown(e) {
 		mouseupListener = canvas.addEventListener('mouseup', mouseup);
 	}
 }
+function rightclick(e) {
+	console.log('right click');
+	e.preventDefault();
+	var rightclickItem = getClickItem(e);
+	if (rightclickItem != null) {
+		if (rightclickItem.class == 'module') {
+			//delete the module, its ports and its connections
+
+			var module = rightclickItem;
+			console.log(module);
+
+			if (module.name == 'input' || module.name == 'output') {
+				//don't delete input or output modules
+				return;
+			}
+
+			//delete the input ports and any connections to each
+			for (var i = 0; i < module.inputs.length; i++) {
+				var port = module.inputs[i];
+				//delete any connections
+				if (port.connections) {
+					DeleteConnectionToInput(port);
+				}
+				//delete the port
+				DeletePort(port);
+			}
+			//delete the output ports and any connections to each
+			for (var i = 0; i < module.outputs.length; i++) {
+				var port = module.outputs[i];
+				//delete any connections
+				if (port.connections) {
+					DeleteConnectionsToOutput(port);
+				}
+				//delete the port
+				DeletePort(port);
+			}
+			//dleete the module itself
+			DeleteModule(module);
+			renderCanvas();
+		}
+	}
+}
 function mousemove(e) {
 	renderCanvas(e);
 	if (dragItem != null) updateDragItem(dragItem, e);
@@ -57,9 +110,9 @@ function mouseup(e) {
 		var hoverItem = getClickItem(e);
 		if (hoverItem != null && hoverItem.class == 'port drag') {
 			CreateConnection(hoverItem.port, dragItem.port);
-		} else {
-			dragItem = null;
+			delete hoverItem.render;
 		}
+		dragItem = null;
 
 		//remove listeners
 		mousemoveListener = canvas.removeEventListener('mousemove', mousemove);

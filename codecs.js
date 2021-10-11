@@ -3,7 +3,17 @@ const outputText = document.querySelector('.OutputText');
 const variableParent = document.querySelector('.VariableParent');
 
 console.log('running codecs');
+
+/*
+each codec is an object so that the constructors can have their own static vars
+*/
 var codecs = {
+	vars: {
+		/*
+		multi codec vars
+		*/
+		isEven: true
+	},
 	'offset': {
 		new: function () {
 			return {
@@ -124,8 +134,25 @@ var codecs = {
 			};
 		}
 	},
+	'text to number': {
+		new: function () {
+			return {
+				inputs: ['string'],
+				outputs: ['number'],
+				getName: function () { return 'Text 2 num' },
+				encode: function ([msg]) {
+					var str = '';
+					for (var i = 0; i < msg.length; i++) {
+						str += String.fromCharCode(msg[i]);
+					}
+					return [str]
+				}
+			}
+		}
+	},
 	'variable': {
-		isEven: true,
+
+		varNo: 1,
 		new: function (outputtype) {
 			//make the elements to control the codec
 			var outDiv = document.createElement('div');
@@ -137,13 +164,14 @@ var codecs = {
 			nameInput.classList.add('VariableNameInput');
 			nameInput.addEventListener('input', function () { if (renderCanvas != null) renderCanvas(); });
 			nameInput.type = 'text';
-
+			nameInput.value = `Var ${this.varNo++}`;
 			var nameLabel = document.createElement('label');
 			nameLabel.innerText = 'Name';
 
 			var valueInput = document.createElement('input');
 			valueInput.classList.add('VariableValueInput');
-			valueInput.type = (outputtype == 'text') ? 'text' : 'number';
+			valueInput.type = (outputtype == 'string') ? 'text' : 'number';
+			valueInput.value = (outputtype == 'string') ? 'beans' : 1;
 
 			var valueLabel = document.createElement('label');
 			valueLabel.innerText = 'Value';
@@ -165,11 +193,40 @@ var codecs = {
 			};
 		}
 	},
-	'random': {
+	'random number': {
 		new: function (outputtype) {
+			//make the elements to control the codec
+			var outDiv = document.createElement('div');
+			if (this.isEven) outDiv.classList.add('even');
+			else outDiv.classList.add('odd');
+			this.isEven = !this.isEven;
+
+			var nameInput = document.createElement('input');
+			nameInput.classList.add('VariableNameInput');
+			nameInput.addEventListener('input', function () { if (renderCanvas != null) renderCanvas(); });
+			nameInput.type = 'text';
+			nameInput.value = `Var ${this.varNo++}`;
+			var nameLabel = document.createElement('label');
+			nameLabel.innerText = 'Name';
+
+			var valueInput = document.createElement('input');
+			valueInput.classList.add('VariableValueInput');
+			valueInput.type = (outputtype == 'string') ? 'text' : 'number';
+			valueInput.value = (outputtype == 'string') ? 'beans' : 1;
+
+			var valueLabel = document.createElement('label');
+			valueLabel.innerText = 'Value';
+
+			outDiv.appendChild(nameLabel);
+			outDiv.appendChild(nameInput);
+			outDiv.appendChild(valueLabel);
+			outDiv.appendChild(valueInput);
+
+			variableParent.appendChild(outDiv);
+
 			return {
-				inputs: ['string',],
-				outputs: ['string'],
+				inputs: ['number'],
+				outputs: ['number'],
 				getName: function () { return 'random'; },
 				encode: function ([msg, seed]) {
 					if (seed == null) seed = 0;
@@ -205,5 +262,8 @@ var codecs = {
 				}
 			};
 		}
+	},
+	'random character': {
+		new: function () { }
 	}
 };

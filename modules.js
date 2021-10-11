@@ -1,5 +1,5 @@
 const modules = [];
-
+var moduleNo = 0;
 function CreateModule(name, codecData) {
 	var codec = codecs[name].new(codecData);
 
@@ -19,6 +19,7 @@ function CreateModule(name, codecData) {
 		height: height,
 		width: 100,
 		name: name,
+		id: moduleNo++
 	};
 
 	function makeInputs() {
@@ -47,10 +48,18 @@ function CreateModule(name, codecData) {
 	return obj;
 }
 function DeleteModule(module) {
-	var index = modules.indexOf(module);
-	if (index !== -1) {
+	function getIndex() {
+		for (var i = 0; i < modules.length; i++) {
+			if (modules[i].id === module.id) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	var index = getIndex();
+	if (index != -1) {
 		modules.splice(index, 1);
 	} else {
-		console.log(`Module doesnt exist: ${module}`);
+		console.log(`Module doesnt exist: ${module.id}`);
 	}
 }
