@@ -7,7 +7,7 @@ function CreateConnection(port1, port2) {
 	2. trying to connect ports of different types
 	3. trying to connect two input ports or two output ports
 	*/
-	if (port1 == port2 || port1.type != port2.type || port1.isInput == port2.isInput) {
+	if (port1 == port2 || port1.type.type != port2.type.type || port1.isInput == port2.isInput) {
 		return;
 	}
 
@@ -20,6 +20,10 @@ function CreateConnection(port1, port2) {
 	} else {
 		inputPort = port2;
 		outputPort = port1;
+	}
+
+	if (inputPort.connections != null) {
+		DeleteConnectionToInput(inputPort);
 	}
 
 	inputPort.connections = outputPort;

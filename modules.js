@@ -4,7 +4,7 @@ function CreateModule(name, codecData) {
 	var codec = codecs[name].new(codecData);
 
 	function calculateHeight(inputs, outputs) {
-		return Math.max(inputs, outputs) * 20 + 20;
+		return Math.max(inputs, outputs) * 15 + 20;
 	}
 	var height = calculateHeight(codec.inputs.length, codec.outputs.length);
 	//Set base object

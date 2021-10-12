@@ -1,6 +1,6 @@
 const ports = [];
 var portNo = 0;
-function CreatePort(module, isInput, place, type) {
+function CreatePort(module, isInput, place, type, name) {
 	var x = isInput ? 8 : module.width - 8,
 		y = module.height / (place + 2),
 		obj = {
@@ -12,7 +12,8 @@ function CreatePort(module, isInput, place, type) {
 			isInput: isInput,
 			type: type,
 			connections: isInput ? null : [],
-			id: portNo++
+			id: portNo++,
+			name: name
 		};
 
 	ports.push(obj);

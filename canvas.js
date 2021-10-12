@@ -1,7 +1,11 @@
 //Shape settings
 var connectionThickness = 5,
 	portRadius = 5,
-	fontSize = 22;
+	moduleFontSize = 22,
+	moduleFont = moduleFontSize + 'px Arial',
+
+	portFontSize = 16,
+	portFont = portFontSize + 'px Arial';
 
 //Colors
 var colors = {
@@ -9,11 +13,15 @@ var colors = {
 	module_text: '#000000',
 	port_set: {
 		'string': '#0000ff',
-		'number': '#ff0000'
+		'number': '#ff0000',
+		'chars': '#ff7f00',
+		'numberlist': '#22e62f'
 	},
 	port_temp: {
 		'string': '#8080ff',
-		'number': '#ff8080'
+		'number': '#ff8080',
+		'chars': '#f0cb8e',
+		'numberlist': '#7ddc83'
 	}
 };
 
@@ -21,7 +29,7 @@ var colors = {
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
-var dragItem, dragOffsetX, dragOffsetY;
+var dragItem, dragOffsetX, dragOffsetY, hoverPort;
 var mousemoveListener, mouseupListener;
 
 //add mandatory listners
@@ -34,6 +42,7 @@ canvas.addEventListener('contextmenu', function (e) {
 }, false);
 
 function mousedown(e) {
+	hoverPort = null;
 	//cehck for right click
 	if (e.which == 3) {
 		rightclick(e);
@@ -61,6 +70,7 @@ function mousedown(e) {
 function rightclick(e) {
 	console.log('right click');
 	e.preventDefault();
+
 	var rightclickItem = getClickItem(e);
 	if (rightclickItem != null) {
 		if (rightclickItem.class == 'module') {
@@ -72,6 +82,10 @@ function rightclick(e) {
 			if (module.name == 'input' || module.name == 'output') {
 				//don't delete input or output modules
 				return;
+			}
+			//get the codec to delete anything if it can (connected elements for inputs, etc)
+			if (module.codec.delete) {
+				module.codec.delete();
 			}
 
 			//delete the input ports and any connections to each
@@ -100,11 +114,33 @@ function rightclick(e) {
 		}
 	}
 }
+function findHoverPort(e) {
+	for (var i = 0; i < ports.length; i++) {
+		var x = e.offsetX,
+			y = e.offsetY,
+			port = ports[i],
+			portx = port.x + port.module.x,
+			porty = port.y + port.module.y,
+			distx = x - portx,
+			disty = y - porty,
+			distance = Math.sqrt(distx * distx + disty * disty);
+
+		//check if clicked on port.
+		if (distance <= portRadius) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
 function mousemove(e) {
+	hoverPort = findHoverPort(e);
+
 	renderCanvas(e);
 	if (dragItem != null) updateDragItem(dragItem, e);
 }
 function mouseup(e) {
+	hoverPort = null;
 	if (dragItem != null) {
 		//connect port if dragged a port onto another port
 		var hoverItem = getClickItem(e);
@@ -127,15 +163,40 @@ function renderCanvas(e) {
 	//clear canvas
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-
 	//lerp function
 	function lerp(a, b, c) {
 		return a + (b - a) * c;
 	}
 
+	function updateModuleSizes(module) {
+		ctx.font = moduleFont;
+		var textWidth = ctx.measureText(module.codec.getName()).width;
+
+		//set new cacluated width
+		module.width = textWidth + 28;
+
+		//set the output positions
+		for (var i = 0; i < module.outputs.length; i++) {
+			var port = module.outputs[i];
+			//set the x
+			port.x = module.width - 8;
+			//set the y
+			port.y = module.height * ((i + 1) / (module.outputs.length + 1));
+		}
+
+		//set the input positions
+		for (var i = 0; i < module.inputs.length; i++) {
+			var port = module.inputs[i];
+			//set the y
+			port.y = module.height * ((i + 1) / (module.inputs.length + 1));
+		}
+		return module.x + 14;
+	}
 	//draw modules
 	for (var i = 0; i < modules.length; i++) {
 		var module = modules[i];
+
+		var textX = updateModuleSizes(module);
 		//get the module display corners
 		var x0 = module.x,
 			y0 = module.y,
@@ -154,30 +215,45 @@ function renderCanvas(e) {
 		//draw module label
 		ctx.beginPath();
 		ctx.fillStyle = '#000000';
-		ctx.font = fontSize + "px Arial";
-		ctx.fillText(module.codec.getName(), x0 + 20, lerp(y0, y1, 0.5) + fontSize / 3);
-	}
+		ctx.font = moduleFont;
 
-	//draw ports
-	for (var i = 0; i < ports.length; i++) {
-		var port = ports[i],
+		ctx.fillText(module.codec.getName(), textX, lerp(y0, y1, 0.5) + moduleFontSize / 3);
+
+		//draw input ports
+		for (var j = 0; j < module.inputs.length; j++) {
+			var port = module.inputs[j],
+				x = port.x + port.module.x,
+				y = port.y + port.module.y;
+
+			//draw the port circle
+			ctx.beginPath();
+			ctx.fillStyle = colors.port_set[port.type.type];
+			ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+
+		//draw input ports
+		for (var j = 0; j < module.outputs.length; j++) {
+			var port = module.outputs[j]
 			x = port.x + port.module.x,
-			y = port.y + port.module.y;
+				y = port.y + port.module.y;
 
-		ctx.beginPath();
-		ctx.fillStyle = colors.port_set[port.type];
-		ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
-		ctx.fill();
+			//draw the port circle
+			ctx.beginPath();
+			ctx.fillStyle = colors.port_set[port.type.type];
+			ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
+			ctx.fill();
+		}
 	}
-
 
 	//draw connections
 	ctx.lineWidth = connectionThickness;
 	for (var i = 0; i < connections.length; i++) {
 		var port1 = connections[i].inputPort, port2 = connections[i].outputPort;
+
 		//render line
 		ctx.beginPath();
-		ctx.strokeStyle = colors.port_set[port1.type];
+		ctx.strokeStyle = colors.port_set[port1.type.type];
 		ctx.moveTo(port1.x + port1.module.x, port1.y + port1.module.y,);
 		ctx.lineTo(port2.x + port2.module.x, port2.y + port2.module.y,);
 		ctx.stroke();
@@ -187,6 +263,21 @@ function renderCanvas(e) {
 
 	if (dragItem != null && dragItem.render != null && e != null) {
 		dragItem.render(ctx, e);
+	}
+
+	//hover port
+	if (hoverPort != null) {
+		var x0 = x.offsetX,
+			x1 =
+				//draw hover box
+				ctx.beginPath();
+		ctx.fillStyle = colors.hoverPort;
+		ctx.moveTo(x0, y0);
+		ctx.lineTo(x0, y1);
+		ctx.lineTo(x1, y1);
+		ctx.lineTo(x1, y0);
+		ctx.fill();
+
 	}
 }
 function getClickItem(e) {
@@ -202,7 +293,7 @@ function getClickItem(e) {
 			port: port,
 			render: function (ctx, e) {
 				//render line
-				ctx.strokeStyle = colors.port_temp[this.port.type];
+				ctx.strokeStyle = colors.port_temp[this.port.type.type];
 				ctx.moveTo(port.x + port.module.x, port.y + port.module.y,);
 				ctx.lineTo(e.offsetX, e.offsetY);
 				ctx.stroke();
@@ -245,8 +336,15 @@ function getClickItem(e) {
 			x1 = connection.outputPort.x + connection.outputPort.module.x,
 			y1 = connection.outputPort.y + connection.outputPort.module.y;
 
+		//check if is within bounds
+		var xMin = Math.min(x0, x1) - connectionThickness / 2,
+			xMax = Math.max(x0, x1) + connectionThickness / 2,
+			yMin = Math.min(y0, y1) - connectionThickness / 2,
+			yMax = Math.max(y0, y1) + connectionThickness / 2
+		if (!(x >= xMin && x <= xMax && y >= yMin && y <= yMax)) {
+			return false;
+		}
 		//based on y = mx + c
-
 		var m = (y1 - y0) / (x1 - x0),
 			c = y0 - m * x0, //c = y - mx
 			calcY = m * x + c,//y = mx + c
@@ -303,12 +401,10 @@ resizeCanvas();
 
 //Add input and output modules
 var inputModule = CreateModule('input');
-inputModule.x = canvas.width / 2 - 200;
-inputModule.y = canvas.height / 2;
+inputModule.x -= 200;
 
 var outputModule = CreateModule('output');
-outputModule.x = canvas.width / 2 + 200;
-outputModule.y = canvas.height / 2;
+outputModule.x += 200;
 
 
 

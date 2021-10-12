@@ -1,6 +1,11 @@
 body {
   overflow-x: hidden;
 }
+.MakeModuleParent {
+  height: 50%;
+  overflow-y: auto;
+  top: 0;
+}
 .VariableParent {
   top: 50%;
   width: 100%;
@@ -123,15 +128,15 @@ body {
 }
 /* Track */
 ::-webkit-scrollbar-track {
-  background: rgb(71, 71, 71);
+  background: rgb(209, 209, 209);
 }
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: rgb(241, 241, 241);
+  background: rgb(88, 88, 88);
 }
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(233, 233, 233);
+  background: rgb(100, 100, 100);
 }
 
 .even {
