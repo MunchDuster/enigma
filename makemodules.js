@@ -11,7 +11,7 @@ for (var codecName in codecs) {
 	if (groups[groupName] == null) {
 		//make the header
 		var h3 = document.createElement('div');
-		h3.innerText = groupName;
+		h3.innerText = groupName + ':';
 		MakeModuleParent.appendChild(h3);
 
 		//put as group
@@ -20,11 +20,9 @@ for (var codecName in codecs) {
 
 
 	button = document.createElement('button');
+	button.classList.add('Side');
 	button.setAttribute('codec', codecName);
 	//styling
-	button.style.display = 'block';
-	button.style.width = '90%';
-	button.style.margin = '3px auto';
 
 	//click listener
 	button.addEventListener('click', (e) => {

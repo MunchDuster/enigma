@@ -2,15 +2,17 @@ body {
   overflow-x: hidden;
 }
 .MakeModuleParent {
-  height: 50%;
-  overflow-y: auto;
-  top: 0;
+  display: none;
+  width: min-content;
+}
+.EncryptionContent {
+  display: block;
+  width: 100vw;
+  height: 50vh;
 }
 .VariableParent {
-  top: 50%;
-  width: 100%;
-  height: 50%;
-  position: absolute;
+  width: min-content;
+  display: none;
   overflow-y: auto;
 }
 .BigInput {
@@ -27,6 +29,12 @@ input,
   font-family: "JetBrains Mono";
   padding: 5px 10px;
 }
+.Side {
+  display: block;
+  width: auto;
+  border-radius: 5px;
+  height: auto;
+}
 .CanvasParent {
   resize: vertical;
   overflow-y: auto;
@@ -35,11 +43,12 @@ input,
 }
 .Sidebar {
   display: inline-block;
-  position: relative;
   right: 0;
+  padding: 5px;
   top: 0;
-  width: 20%;
+  width: auto;
   height: 100%;
+  overflow-y: overlay;
   background-color: rgb(241, 241, 241);
 }
 h3 {
@@ -48,6 +57,7 @@ h3 {
   text-decoration: underline;
   font-size: 20px;
   font-family: "JetBrains Mono";
+  background-color: #ebebeb;
 }
 canvas,
 .SmallBox,
@@ -68,8 +78,9 @@ input,
 }
 
 canvas {
-  display: block;
-  margin: auto;
+  display: inline-block;
+  left: 0;
+  user-select: none;
 }
 .Line {
   background-color: rgb(255, 128, 128);
@@ -147,7 +158,7 @@ body {
 }
 
 .footer {
-  /* position: absolute; */
+  position: absolute;
   padding: 4px;
   bottom: 0px;
 

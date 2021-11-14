@@ -15,65 +15,34 @@ function copyText() {
 	window.getSelection().removeAllRanges(); // to deselect
 }
 function save() {
-	var id = 0;
+	console.log('saving');
 	var saveModules = [];
 	var saveConnections = [];
-	var savePorts = [];
-
 	for (var i = 0; i < modules.length; i++) {
 		var module = modules[i];
-		var saveInputs = [];
-		var saveOutputs = [];
-
-		for (var j = 0; j < module.inputs.length; j++) {
-			var port = module.inputs[j],
-				savePort = {
-					id: id++,
-					type: port.type,
-					place: port.place,
-				};
-
-			savePorts.push(savePort);
-			saveInputs.push(savePorts.indexOf(savePort));
-		}
-		for (var j = 0; j < module.outputs.length; j++) {
-			var port = module.outputs[j],
-				savePort = {
-					id: id++,
-					type: port.type,
-					place: port.place,
-				};
-
-			savePorts.push(savePort);
-			saveInputs.push(savePorts.indexOf(savePort));
-		}
-
+		module.id = i;
 		var saveModule = {
 			name: module.name,
 			codecData: module.codecData,
 			x: module.x,
 			y: module.y,
-			id: id++,
-			inputs: saveInputs,
-			outputs: saveOutputs,
+			id: module.id,
 		};
-		module.id = id;
 
 		saveModules.push(saveModule);
 	}
 	for (var i = 0; i < connections.length; i++) {
 		var connection = connections[i],
-			saveConnections = {
-				port1: {
-					place: connection.port1.place,
-					id: connection.port1.id,
+			saveConnection = {
+				outputPort: {
+					module: connection.outputPort.module.id,
+					place: connection.outputPort.place,
 				},
-				port2: {
-					place: connection.port2.place,
-					id: connection.port2.id,
+				inputPort: {
+					module: connection.inputPort.module.id,
+					place: connection.inputPort.place,
 				},
 			};
-
 		saveConnections.push(saveConnection);
 	}
 	localStorage.setItem('modules', JSON.stringify(saveModules));
@@ -82,20 +51,60 @@ function save() {
 
 //Attempt to load saved data
 try {
+	console.log('attempting to load saved data.');
 	var loadedModules = JSON.parse(localStorage.getItem('modules'));
 	var loadedConnections = JSON.parse(localStorage.getItem('connections'));
 
+	if (loadedModules == null && loadedConnections == null) throw 'No saved data to load';
+	console.log(loadedModules, loadedConnections);
+	setLoading(true);
+
+
 	//Create the modules
-	for (var loadedModule in loadedModules) {
-		var module = CreateModule(loadedModule.name, loadedModule.codecData);
+	for (var index in loadedModules) {
+		var loadedModule = loadedModules[index];
+		var module = CreateModule(loadedModule.name, loadedModule.codecData, loadedModule.id);
 		module.x = loadedModule.x;
 		module.y = loadedModule.y;
 	}
 
 	//Create the connections
-	for (var loadedConnection in loadedConnections) {
+	for (var index in loadedConnections) {
+		var loadedConnection = loadedConnections[index];
 		//var connection = CreateConnection(loadedConnection.port, loadedConnection.)
+		var port1Module = modules.find(module => {
+			return module.id == loadedConnection.inputPort.module;
+		}),
+			port2Module = modules.find(module => {
+				return module.id == loadedConnection.outputPort.module;
+			});
+
+		var port1 = port1Module.inputs[loadedConnection.inputPort.place],
+			port2 = port2Module.outputs[loadedConnection.outputPort.place];
+
+
+		var connection = CreateConnection(port1, port2);
 	}
+
+	setLoading(false);
 } catch (e) {
-	console.error('Could not load: ', e);
+	console.log('could not load saved data.');
+	//Add input and output modules
+	var inputModule = CreateModule('input');
+	inputModule.x -= 180;
+
+	var outputModule = CreateModule('output');
+	outputModule.x += 180;
+
+
+
+	CreateConnection(inputModule.outputs[0], outputModule.inputs[0]);
+}
+
+
+function hide(ele) {
+	ele.style.display = 'none';
+}
+function show(ele) {
+	ele.style.display = ele.style.display == 'inline-block' ? 'none' : 'inline-block';
 }

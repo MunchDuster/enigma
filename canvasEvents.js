@@ -1,40 +1,17 @@
-//Shape settings
-var connectionThickness = 5,
-	portRadius = 5,
-	moduleFontSize = 22,
-	moduleFont = moduleFontSize + 'px Arial',
+const zoomStep = 0.2,
+	maxZoom = 2,
+	minZoom = 0.4;
 
-	portFontSize = 16,
-	portFont = portFontSize + 'px Arial';
 
-//Colors
-var colors = {
-	module_bg: '#cfcfcf',
-	module_text: '#000000',
-	port_set: {
-		'string': '#0000ff',
-		'number': '#ff0000',
-		'chars': '#ff7f00',
-		'numberlist': '#22e62f'
-	},
-	port_temp: {
-		'string': '#8080ff',
-		'number': '#ff8080',
-		'chars': '#f0cb8e',
-		'numberlist': '#7ddc83'
-	}
-};
-
-//get and prepare the canvas
-const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
-
-var dragItem, dragOffsetX, dragOffsetY, hoverPort;
+//vars
+var dragItem, dragOffsetX, dragOffsetY, lastMoveX, lastMoveY, isActive = true, isMoving = false;
 var mousemoveListener, mouseupListener;
 
 //add mandatory listners
 window.addEventListener('resize', resizeCanvas);
 canvas.addEventListener('mousedown', mousedown);
+canvas.addEventListener('mousemove', mousemove);
+canvas.addEventListener('wheel', zoom);
 
 //prevent the default right click options when right clicking on the canvas
 canvas.addEventListener('contextmenu', function (e) {
@@ -48,9 +25,8 @@ function mousedown(e) {
 		rightclick(e);
 		return;
 	}
+
 	dragItem = getClickItem(e);
-	console.log('mousedown');
-	console.log(dragItem);
 	if (dragItem != null) {
 		if (dragItem.class == 'connection') {
 			DeleteConnection(dragItem);
@@ -62,10 +38,17 @@ function mousedown(e) {
 		//set the offset
 		dragOffsetX = e.offsetX - dragItem.x;
 		dragOffsetY = e.offsetY - dragItem.y;
-		//add the listeners
-		mousemoveListener = canvas.addEventListener('mousemove', mousemove);
-		mouseupListener = canvas.addEventListener('mouseup', mouseup);
 	}
+	else {
+		//moving across space
+		//set the last to be this
+		lastMoveX = e.offsetX;
+		lastMoveY = e.offsetY;
+		isMoving = true;
+	}
+
+	//add listener
+	mouseupListener = canvas.addEventListener('mouseup', mouseup);
 }
 function rightclick(e) {
 	console.log('right click');
@@ -115,29 +98,54 @@ function rightclick(e) {
 	}
 }
 function findHoverPort(e) {
+	var x = e.offsetX + offsetX,
+		y = e.offsetY + offsetY;
 	for (var i = 0; i < ports.length; i++) {
-		var x = e.offsetX,
-			y = e.offsetY,
-			port = ports[i],
-			portx = port.x + port.module.x,
-			porty = port.y + port.module.y,
+		var port = ports[i],
+			portx = port.localX + port.module.worldX,
+			porty = port.localY + port.module.worldY,
 			distx = x - portx,
 			disty = y - porty,
 			distance = Math.sqrt(distx * distx + disty * disty);
 
 		//check if clicked on port.
-		if (distance <= portRadius) {
-			return true;
-		} else {
-			return false;
+		if (distance <= portRadius * zoomMultiplier) {
+			return port;
 		}
 	}
+	return null;
 }
 function mousemove(e) {
-	hoverPort = findHoverPort(e);
+	//if dragging something
+	if (dragItem != null) {
+		updateDragItem(dragItem, e);
+	}
+	//if moving across space
+	else if (isMoving) {
+		offsetX += (e.offsetX - lastMoveX) * zoomMultiplier;
+		offsetY += (e.offsetY - lastMoveY) * zoomMultiplier;
+
+		lastMoveX = e.offsetX;
+		lastMoveY = e.offsetY;
+	}
+	// neither of above, maybe hovering
+	else {
+		//find hover object port
+		var clickItem = getClickItem(e);
+
+		//hover other
+		if (clickItem == null) return;
+
+		if (clickItem.class == 'port drag') {
+			showHoverInfo(e, clickItem.port.type.name)
+		} else if (clickItem.class == 'module') {
+			//showHoverInfo(e, codecs[module.name].meta.info);
+		} else if (clickItem.class == 'connection') {
+			showHoverInfo(e, 'connection passes ' + clickItem.inputPort.type.type);
+		}
+	}
 
 	renderCanvas(e);
-	if (dragItem != null) updateDragItem(dragItem, e);
 }
 function mouseup(e) {
 	hoverPort = null;
@@ -150,136 +158,15 @@ function mouseup(e) {
 		}
 		dragItem = null;
 
-		//remove listeners
-		mousemoveListener = canvas.removeEventListener('mousemove', mousemove);
+		//remove listener
 		mouseupListener = canvas.removeEventListener('mouseup', mouseup);
 
 		renderCanvas();
 	}
+	isMoving = false;
 }
 
 
-function renderCanvas(e) {
-	//clear canvas
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	//lerp function
-	function lerp(a, b, c) {
-		return a + (b - a) * c;
-	}
-
-	function updateModuleSizes(module) {
-		ctx.font = moduleFont;
-		var textWidth = ctx.measureText(module.codec.getName()).width;
-
-		//set new cacluated width
-		module.width = textWidth + 28;
-
-		//set the output positions
-		for (var i = 0; i < module.outputs.length; i++) {
-			var port = module.outputs[i];
-			//set the x
-			port.x = module.width - 8;
-			//set the y
-			port.y = module.height * ((i + 1) / (module.outputs.length + 1));
-		}
-
-		//set the input positions
-		for (var i = 0; i < module.inputs.length; i++) {
-			var port = module.inputs[i];
-			//set the y
-			port.y = module.height * ((i + 1) / (module.inputs.length + 1));
-		}
-		return module.x + 14;
-	}
-	//draw modules
-	for (var i = 0; i < modules.length; i++) {
-		var module = modules[i];
-
-		var textX = updateModuleSizes(module);
-		//get the module display corners
-		var x0 = module.x,
-			y0 = module.y,
-			x1 = module.x + module.width,
-			y1 = module.y + module.height;
-
-		//draw module box
-		ctx.beginPath();
-		ctx.fillStyle = colors.module_bg;
-		ctx.moveTo(x0, y0);
-		ctx.lineTo(x0, y1);
-		ctx.lineTo(x1, y1);
-		ctx.lineTo(x1, y0);
-		ctx.fill();
-
-		//draw module label
-		ctx.beginPath();
-		ctx.fillStyle = '#000000';
-		ctx.font = moduleFont;
-
-		ctx.fillText(module.codec.getName(), textX, lerp(y0, y1, 0.5) + moduleFontSize / 3);
-
-		//draw input ports
-		for (var j = 0; j < module.inputs.length; j++) {
-			var port = module.inputs[j],
-				x = port.x + port.module.x,
-				y = port.y + port.module.y;
-
-			//draw the port circle
-			ctx.beginPath();
-			ctx.fillStyle = colors.port_set[port.type.type];
-			ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
-			ctx.fill();
-		}
-
-		//draw input ports
-		for (var j = 0; j < module.outputs.length; j++) {
-			var port = module.outputs[j]
-			x = port.x + port.module.x,
-				y = port.y + port.module.y;
-
-			//draw the port circle
-			ctx.beginPath();
-			ctx.fillStyle = colors.port_set[port.type.type];
-			ctx.arc(x, y, portRadius, 0, 2 * Math.PI);
-			ctx.fill();
-		}
-	}
-
-	//draw connections
-	ctx.lineWidth = connectionThickness;
-	for (var i = 0; i < connections.length; i++) {
-		var port1 = connections[i].inputPort, port2 = connections[i].outputPort;
-
-		//render line
-		ctx.beginPath();
-		ctx.strokeStyle = colors.port_set[port1.type.type];
-		ctx.moveTo(port1.x + port1.module.x, port1.y + port1.module.y,);
-		ctx.lineTo(port2.x + port2.module.x, port2.y + port2.module.y,);
-		ctx.stroke();
-	}
-
-	//draw the dragObject (if its a maybe connection)
-
-	if (dragItem != null && dragItem.render != null && e != null) {
-		dragItem.render(ctx, e);
-	}
-
-	//hover port
-	if (hoverPort != null) {
-		var x0 = x.offsetX,
-			x1 =
-				//draw hover box
-				ctx.beginPath();
-		ctx.fillStyle = colors.hoverPort;
-		ctx.moveTo(x0, y0);
-		ctx.lineTo(x0, y1);
-		ctx.lineTo(x1, y1);
-		ctx.lineTo(x1, y0);
-		ctx.fill();
-
-	}
-}
 function getClickItem(e) {
 	var x = e.offsetX,
 		y = e.offsetY;
@@ -288,13 +175,13 @@ function getClickItem(e) {
 	function createPortDrag(port) {
 		var obj = {
 			class: 'port drag',
-			x: e.offsetX,
-			y: e.offsetY,
+			x: x,
+			y: y,
 			port: port,
 			render: function (ctx, e) {
 				//render line
 				ctx.strokeStyle = colors.port_temp[this.port.type.type];
-				ctx.moveTo(port.x + port.module.x, port.y + port.module.y,);
+				ctx.moveTo(port.x + port.module.screenX, port.y + port.module.screenY);
 				ctx.lineTo(e.offsetX, e.offsetY);
 				ctx.stroke();
 			},
@@ -304,10 +191,10 @@ function getClickItem(e) {
 	}
 	//functions used to check if click on anything
 	function pointIsOnModule(module) {
-		var x0 = module.x,
-			y0 = module.y,
-			x1 = module.x + module.width,
-			y1 = module.y + module.height;
+		var x0 = module.screenX,
+			y0 = module.screenY,
+			x1 = module.screenX + module.width,
+			y1 = module.screenY + module.height;
 		if (x > x0 && y > y0 && x < x1 && y < y1) {
 			return true;
 		}
@@ -392,21 +279,43 @@ function updateDragItem(item, e) {
 }
 
 function resizeCanvas() {
-	console.log("resize");
-	// ...then set the internal size to match
-	canvas.width = canvas.parentElement.offsetWidth - 14;
+	canvas.width = canvas.parentElement.offsetWidth * 0.8 - canvas.style.margin;
+	canvas.height = canvas.parentElement.offsetHeight;
+
+	//canvas.style.width = canvas.width + 'px';
+	//canvas.style.height = canvas.height + 'px';
 	renderCanvas();
 }
+
+function setLoading(isLoading) {
+	console.log('setting loading: ' + isLoading);
+	console.log('stack trace: ', new Error('Whoops!').stack);
+	isActive = !isLoading;
+	if (isLoading) {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+		//draw loading text
+		ctx.beginPath();
+		ctx.font = '40px Arial';
+		ctx.fillStyle = 'black';
+
+		ctx.fillText('Loading', canvas.width / 2, canvas.height / 2);
+
+	} else {
+		renderCanvas();
+	}
+}
+
+function zoom(event) {
+	const clamp = (val, min, max) => { return Math.max(Math.min(val, max), min) };
+	event.preventDefault();
+
+	zoomMultiplier += Math.sign(-event.deltaY) * zoomStep;
+	console.log(`Zoom is ${zoomMultiplier}`);
+
+	// Restrict scale
+	zoomMultiplier = clamp(zoomMultiplier, minZoom, maxZoom);
+	renderCanvas();
+}
+
 resizeCanvas();
-
-//Add input and output modules
-var inputModule = CreateModule('input');
-inputModule.x -= 200;
-
-var outputModule = CreateModule('output');
-outputModule.x += 200;
-
-
-
-CreateConnection(inputModule.outputs[0], outputModule.inputs[0]);
-renderCanvas();

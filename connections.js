@@ -1,4 +1,4 @@
-const connections = [];
+var connections = [];
 var connectionNo = 0;
 function CreateConnection(port1, port2) {
 	/*

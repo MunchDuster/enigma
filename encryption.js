@@ -3,18 +3,17 @@ function getModulesOrder() {
 	var modulesOrder = [];
 	function getInputModules(module) {
 		//put into modules list
-		modulesOrder.push(module);
+		modulesOrder.unshift(module);
 		//increment order counter
 		//got to the inputs
 		for (var i = 0; i < module.inputs.length; i++) {
 			if (module.inputs[i].connections != null) {
 				var connectedModule = module.inputs[i].connections.module;
-				if (!modulesOrder.includes(connectedModule)) {
-					getInputModules(connectedModule);
-				} else {
-					console.log('already in ilst');
-					console.log(connectedModule);
+				if (modulesOrder.includes(connectedModule)) {
+					//remove from array at that place
+					modulesOrder.splice(modulesOrder.indexOf(connectedModule), 1);
 				}
+				getInputModules(connectedModule);
 			} else {
 				console.log('empty input');
 			}
@@ -32,7 +31,7 @@ function encode() {
 
 
 	//now use them in correct order
-	for (var i = moduleList.length - 1; i >= 0; i--) {
+	for (var i = 0; i < moduleList.length; i++) {
 		var module = moduleList[i];
 
 		//get the inputs values
@@ -41,14 +40,12 @@ function encode() {
 			var port = module.inputs[j];
 			inputValues.push(port.value);
 		}
-
 		//calculate output values
 		var outputValues = module.codec.encode(inputValues);
 
 		//no outputs, (output module reached)
 		if (outputValues == null) {
 			//end of modules
-			console.log('output reached');
 			return;
 		}
 
@@ -59,15 +56,16 @@ function encode() {
 			for (var k = 0; k < port.connections.length; k++) {
 				var connection = port.connections[k];
 				connection.value = outputValues[j];
-				console.log('setting connection');
 			}
 		}
 	}
 }
 function decode() {
 	console.log('decoding');
-	var moduleList = getInputModules();
+	var moduleList = getModulesOrder();
 
+	//send data from extractors
+	//all vars send their data to their connections	
 
 	//now use them in correct order
 	for (var i = moduleList.length - 1; i >= 0; i--) {
@@ -76,16 +74,17 @@ function decode() {
 		//get the inputs values
 		var inputValues = [];
 		for (var j = 0; j < module.inputs.length; j++) {
-			if (module.inputs[j].connections != null) {
-				module.inputs[j].value = module.inputs[j].connections.value;
-			} else {
-				console.log('no connection');
-			}
 			inputValues.push(module.inputs[j].value);
 		}
+		console.log('module: ' + module.name);
+		console.log('inputs: ');
+		console.log(inputValues);
 
 		//calculate output values
-		var outputValues = module.codec.encode(inputValues);
+		var outputValues = module.codec.decode(module.inputs, module.outputs);
+
+		console.log('outputs: ');
+		console.log(outputValues);
 
 		//no outputs, (output module reached)
 		if (outputValues == null) {
@@ -96,7 +95,7 @@ function decode() {
 
 		//set the connections values
 		for (var j = 0; j < module.outputs.length; j++) {
-			module.outputs[j].value = outputValues[j];
+			module.inputs[j].value = outputValues[j];
 		}
 	}
 }

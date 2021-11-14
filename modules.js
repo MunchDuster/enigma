@@ -1,25 +1,25 @@
-const modules = [];
+var modules = [];
 var moduleNo = 0;
-function CreateModule(name, codecData) {
-	var codec = codecs[name].new(codecData);
 
-	function calculateHeight(inputs, outputs) {
-		return Math.max(inputs, outputs) * 15 + 20;
-	}
-	var height = calculateHeight(codec.inputs.length, codec.outputs.length);
+function CreateModule(name, codecData, id) {
+	var codec = codecs[name].new(codecData);
 	//Set base object
 	var obj = {
 		class: 'module',
+		get screenX() { return this.x + offsetX },
+		get screenY() { return this.y + offsetY },
+		get worldX() { return (this.x + offsetX) * zoomMultiplier },
+		get worldY() { return (this.y + offsetY) * zoomMultiplier },
+		get height() { return (Math.max(this.inputs.length, this.outputs.length) * 15 + 20) * zoomMultiplier },
+		get width() { return ctx.measureText(this.codec.getName()).width + 28 * zoomMultiplier },
 		x: canvas.width / 2,
 		y: canvas.height / 2,
 		codec: codec,
 		codecData: codecData,
 		inputs: [],
 		outputs: [],
-		height: height,
-		width: 100,
 		name: name,
-		id: moduleNo++
+		id: id == null ? moduleNo++ : id
 	};
 
 	function makeInputs() {
@@ -27,7 +27,7 @@ function CreateModule(name, codecData) {
 		var inputs = codec.inputs;
 
 		for (var i = 0; i < inputs.length; i++) {
-			var port = CreatePort(obj, true, i, inputs[i]);
+			var port = CreateInputPort(obj, i, inputs[i].type, inputs[i].name);
 			obj.inputs.push(port);
 		}
 	}
@@ -35,7 +35,7 @@ function CreateModule(name, codecData) {
 		//Get and return all outputs on element
 		var outputs = codec.outputs;
 		for (var i = 0; i < outputs.length; i++) {
-			var port = CreatePort(obj, false, i, outputs[i]);
+			var port = CreateOutputPort(obj, i, outputs[i].type, outputs[i].name);
 			obj.outputs.push(port);
 		}
 	}

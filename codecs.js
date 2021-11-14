@@ -2,20 +2,14 @@ const inputText = document.querySelector('.InputText');
 const outputText = document.querySelector('.OutputText');
 const variableParent = document.querySelector('.VariableParent');
 
-console.log('running codecs');
-
-/*
-	multi codec vars
-*/
+// multi codec vars
 var vars = {
 
 	isEven: true
 };
-/*
-each codec is an object so that the constructors can have their own static vars
-*/
-var codecs = {
 
+// each codec is an object so that the constructors can have their own static vars
+var codecs = {
 	'add': {
 		meta: {
 			group: 'modifier',
@@ -25,7 +19,7 @@ var codecs = {
 
 				inputs: [
 					{ type: 'chars', name: 'chars to add to' },
-					{ type: 'number', name: 'add amount' }
+					{ type: 'numberlist', name: 'add amounts' }
 				],
 				outputs: [
 					{ type: 'chars', name: 'output' }
@@ -33,12 +27,12 @@ var codecs = {
 				getName: function () {
 					return 'offset';
 				},
-				encode: ([chars, amt]) => {
-					if (amt == null) move = 1;
+				encode: ([chars, amts]) => {
+					if (amts == null) amts = [1];
 					for (var i = 0; i < chars.length; i++) {
-						chars[i] = String.fromCharCode(msg.charCodeAt(i) + move);
+						chars[i] += amts[i % amts.length];
 					}
-					return [output];
+					return [chars];
 				},
 				decode: (msg, move) => {
 					var output = "";
@@ -131,6 +125,7 @@ var codecs = {
 	'output': {
 		meta: {
 			group: 'static',
+			info: 'sets output text'
 		},
 		new: function () {
 			return {
@@ -153,6 +148,7 @@ var codecs = {
 	'input': {
 		meta: {
 			group: 'static',
+			info: 'get the input text'
 		},
 		new: function () {
 			return {
@@ -175,6 +171,7 @@ var codecs = {
 	'variable string': {
 		meta: {
 			group: 'variable',
+			info: 'send text to connection'
 		},
 		varNo: 1,
 		new: function () {
@@ -217,12 +214,66 @@ var codecs = {
 					{ type: 'string', name: 'value' }
 				],
 				type: 'string',
-				outDiv: outDiv,
 				getName: function () { return nameInput.value; },
 				encode: function () { return [valueInput.value]; },
 				decode: function () { },
 				delete: function () {
-					this.outDiv.parentElement.removeChild(this.outDiv);
+					outDiv.parentElement.removeChild(outDiv);
+				}
+			};
+		}
+	},
+	'variable number': {
+		meta: {
+			group: 'variable',
+			info: 'sends number to connection'
+		},
+		varNo: 1,
+		new: function () {
+			function makeElements(codec) {
+				//make the elements to control the codec
+				var outDiv = document.createElement('div');
+				if (this.isEven) outDiv.classList.add('even');
+				else outDiv.classList.add('odd');
+				this.isEven = !this.isEven;
+
+				var nameInput = document.createElement('input');
+				nameInput.classList.add('VariableNameInput');
+				nameInput.addEventListener('input', function () { if (renderCanvas != null) renderCanvas(); });
+				nameInput.type = 'text';
+				nameInput.value = `Var ${codec.varNo++}`;
+				var nameLabel = document.createElement('label');
+				nameLabel.innerText = 'Name';
+
+				var valueInput = document.createElement('input');
+				valueInput.classList.add('VariableValueInput');
+				valueInput.type = 'number';
+				valueInput.value = 'beans';
+
+				var valueLabel = document.createElement('label');
+				valueLabel.innerText = 'Value';
+
+				outDiv.appendChild(nameLabel);
+				outDiv.appendChild(nameInput);
+				outDiv.appendChild(valueLabel);
+				outDiv.appendChild(valueInput);
+
+				variableParent.appendChild(outDiv);
+
+				return { outDiv, nameInput, valueInput };
+			}
+			var { outDiv, nameInput, valueInput } = makeElements(this);
+			return {
+				inputs: [],
+				outputs: [
+					{ type: 'number', name: 'value' }
+				],
+				type: 'number',
+				getName: function () { return nameInput.value; },
+				encode: function () { return [parseInt(valueInput.value)]; },
+				decode: function () { },
+				delete: () => {
+					outDiv.parentElement.removeChild(outDiv);
 				}
 			};
 		}
@@ -230,9 +281,10 @@ var codecs = {
 	'random number': {
 		meta: {
 			group: 'variable',
+			info: 'generates x random numbers'
 		},
 		varNo: 1,
-		new: function (outputtype) {
+		new: function () {
 			function makeElements(codec) {
 				//make the elements to control the codec
 				var outDiv = document.createElement('div');
@@ -303,10 +355,9 @@ var codecs = {
 					// 	newstr += msg[i];
 					// }
 					var numbers = [];
+					var max = maxInput.value, min = minInput.value;
 					for (var i = 0; i < amount; i++) {
-
-						numbers.push(generator.random());
-						console.log(numbers[numbers.length - 1]);
+						numbers.push(Math.floor(generator.random() * (max - min) + min));
 					}
 					return [numbers];
 				},
@@ -336,18 +387,29 @@ var codecs = {
 	'random character': {
 		meta: {
 			group: 'variable',
+			info: 'generates x random characters'
 		},
 		new: function () {
 			return {
 
 				inputs: [
-					{ type: 'number', name: 'seed' }
+					{ type: 'number', name: 'seed' },
+					{ type: 'number', name: 'how many to generate' },
 				],
 				outputs: [
-					{ type: 'chars', name: 'random character' }
+					{ type: 'chars', name: 'random characters' }
 				],
 				getName: function () { return 'Random char' },
-				encode: function () { return },
+				encode: function ([seed, amount]) {
+					var m = new MersenneTwister(seed);
+					var chars = [];
+					for (var i = 0; i < amount; i++) {
+						var randomNumber = m.random() * 200,
+							charCode = randomNumber + 48;
+						chars.push(charCode);
+					}
+					return [chars];
+				},
 				decode: function () { }
 			};
 		}
@@ -355,6 +417,7 @@ var codecs = {
 	'text to chars': {
 		meta: {
 			group: 'converter',
+			info: 'converts text to chars'
 		},
 		new: function () {
 			return {
@@ -380,6 +443,7 @@ var codecs = {
 	'chars to text': {
 		meta: {
 			group: 'converter',
+			info: 'converts chars to text'
 		},
 		new: function () {
 			return {
@@ -404,10 +468,10 @@ var codecs = {
 	'merge chars': {
 		meta: {
 			group: 'joiners and splitters',
+			info: 'combine two chars inputs'
 		},
 		new: function () {
 			return {
-
 				inputs: [
 					{ type: 'chars', name: 'chars1' },
 					{ type: 'chars', name: 'chars2' },
@@ -435,7 +499,7 @@ var codecs = {
 						chars2.splice(0, i);
 						chunkNo++;
 					}
-					return mergedChars;
+					return [mergedChars];
 				},
 				decode: function () { }
 			};
@@ -443,7 +507,8 @@ var codecs = {
 	},
 	'text length': {
 		meta: {
-			group: 'extractor'
+			group: 'extractors',
+			info: 'get the number of chars in text'
 		},
 		new: function () {
 			return {
@@ -458,6 +523,47 @@ var codecs = {
 				decode: function () { }
 			};
 		}
-	}
-
+	},
+	'number list item': {
+		meta: {
+			group: 'extractors',
+			info: 'get item from numberlist'
+		},
+		new: function () {
+			return {
+				inputs: [
+					{ type: 'numberlist', name: 'list to pick number from' },
+					{ type: 'number', name: 'number' }
+				],
+				outputs: [
+					{ type: 'number', name: 'number chosen' }
+				],
+				getName: function () { return 'number list item' },
+				encode: function ([list, index]) {
+					if (index == null) index = 0;
+					return [list[index]];
+				},
+				decode: function ([]) { return []; }
+			};
+		}
+	},
+	'number to list': {
+		meta: {
+			group: 'converter',
+			info: 'converts a number to a list'
+		},
+		new: function () {
+			return {
+				inputs: [
+					{ type: 'number', name: 'input' }
+				],
+				outputs: [
+					{ type: 'numberlist', name: 'output' }
+				],
+				getName: function () { return 'number to list' },
+				encode: function ([num]) { return [[num]]; },
+				decode: function ([]) { return []; }
+			};
+		}
+	},
 };
