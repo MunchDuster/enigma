@@ -7,47 +7,49 @@
 		<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
 	</head>
 	<body>
-		<h2>Enigma</h2>
-		
-		Input
-		<div class="BigBox InputText" spellcheck="false" contentEditable="true" id="input">Hello World!</div>
-		
-		<!-- Buttons -->
-		Actions <br>
-		<button onclick="encode();">Encode</button>
-		<button onclick="save();">Save</button>
-		<button onclick="decode();">Decode</button>
-		<br>
-		
-		Encryption
-		<div class="EncryptionContent">
-			<canvas height="500px"></canvas>
-			<div class="Sidebar">
-				<div>
-					<button class="Side"
-						onclick="show(document.querySelector('.MakeModuleParent')); hide(document.querySelector('.VariableParent'));">Make
-						Module</button>
-					<button class="Side"
-						onclick="show(document.querySelector('.VariableParent')); hide(document.querySelector('.MakeModuleParent'));">Modify
-						Module</button>
-				</div>
-				<div class="MakeModuleParent">
-					<h3>Modules</h3>
-				</div>
-				<div class="VariableParent">
-					<h3>Variables</h3>
+		<main>
+			<h2>Enigma</h2>
+			
+			Input
+			<div class="BigBox InputText" spellcheck="false" contentEditable="true" id="input">Hello World!</div>
+			
+			<!-- Buttons -->
+			Actions
+			<br>
+			
+			<button onclick="encode();">Encode</button>
+			<button onclick="save();">Save</button>
+			<button onclick="decode();">Decode</button>
+			<br>
+			
+			Encryption
+			<div class="EncryptionContent">
+				<canvas height="500px"></canvas>
+				<div class="Sidebar">
+					<div>
+						<button class="Side"
+							onclick="show(document.querySelector('.MakeModuleParent')); hide(document.querySelector('.VariableParent'));">Make
+							Module</button>
+						<button class="Side"
+							onclick="show(document.querySelector('.VariableParent')); hide(document.querySelector('.MakeModuleParent'));">Modify
+							Module</button>
+					</div>
+					<div class="MakeModuleParent">
+						<h3>Modules</h3>
+					</div>
+					<div class="VariableParent">
+						<h3>Variables</h3>
+					</div>
 				</div>
 			</div>
-		</div>
-		
-		Output
-		<div class="BigBox OutputText"></div>
-		
-
-
-			<div class="footer">
-				Noise provided by <a style="color: rgb(199, 199, 199);" href="https://github.com/davidbau">David Bau</a>
-			</div>
+			
+			Output
+			<div class="BigBox OutputText"></div>
+		</main>
+		<footer>
+			Noise provided by 
+			<a style="color: rgb(199, 199, 199);" href="https://github.com/davidbau">David Bau</a>
+		</footer>
 
 		<script src="random.js"></script>
 		<script src="codecs.js"></script>

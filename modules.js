@@ -6,10 +6,8 @@ function CreateModule(name, codecData, id) {
 	//Set base object
 	var obj = {
 		class: 'module',
-		get screenX() { return this.x + offsetX },
-		get screenY() { return this.y + offsetY },
-		get worldX() { return (this.x + offsetX) * zoomMultiplier },
-		get worldY() { return (this.y + offsetY) * zoomMultiplier },
+		get worldX() { return this.x * zoomMultiplier + offsetX; },
+		get worldY() { return this.y * zoomMultiplier + offsetY; },
 		get height() { return (Math.max(this.inputs.length, this.outputs.length) * 15 + 20) * zoomMultiplier },
 		get width() { return ctx.measureText(this.codec.getName()).width + 28 * zoomMultiplier },
 		x: canvas.width / 2,

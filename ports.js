@@ -21,7 +21,7 @@ function CreateInputPort(module, place, type, name) {
 		get: function () { return 8 * zoomMultiplier }
 	});
 	Object.defineProperty(obj, 'localY', {
-		get: function () { return module.height * (place + 1) / (module.inputs.length + 1) }
+		get: function () { return module.height * (obj.place + 1) / (module.inputs.length + 1) }
 	});
 
 	ports.push(obj);
@@ -34,7 +34,7 @@ function CreateOutputPort(module, place, type, name) {
 		get: function () { return module.width - 8 * zoomMultiplier }
 	});
 	Object.defineProperty(obj, 'localY', {
-		get: function () { return module.height * (place + 1) / (module.outputs.length + 1) }
+		get: function () { return (module.height * (obj.place + 1)) / (module.outputs.length + 1); }
 	});
 
 	ports.push(obj);

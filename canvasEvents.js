@@ -98,8 +98,8 @@ function rightclick(e) {
 	}
 }
 function findHoverPort(e) {
-	var x = e.offsetX + offsetX,
-		y = e.offsetY + offsetY;
+	var x = e.offsetX / zoomMultiplier + offsetX,
+		y = e.offsetY / zoomMultiplier + offsetY;
 	for (var i = 0; i < ports.length; i++) {
 		var port = ports[i],
 			portx = port.localX + port.module.worldX,
@@ -122,8 +122,8 @@ function mousemove(e) {
 	}
 	//if moving across space
 	else if (isMoving) {
-		offsetX += (e.offsetX - lastMoveX) * zoomMultiplier;
-		offsetY += (e.offsetY - lastMoveY) * zoomMultiplier;
+		offsetX += (e.offsetX - lastMoveX) / zoomMultiplier;
+		offsetY += (e.offsetY - lastMoveY) / zoomMultiplier;
 
 		lastMoveX = e.offsetX;
 		lastMoveY = e.offsetY;
@@ -167,9 +167,12 @@ function mouseup(e) {
 }
 
 
-function getClickItem(e) {
-	var x = e.offsetX,
-		y = e.offsetY;
+function getClickItem(e) {	
+	var x = e.offsetX * zoomMultiplier + offsetX,
+		y = e.offsetY * zoomMultiplier + offsetY;
+	
+	console.log(`screen ${e.offsetX}, ${e.offsetY}`);
+	console.log(`world ${x}, ${y}`);
 
 	//function used to create an item to drag to make a port connection
 	function createPortDrag(port) {
@@ -180,8 +183,8 @@ function getClickItem(e) {
 			port: port,
 			render: function (ctx, e) {
 				//render line
-				ctx.strokeStyle = colors.port_temp[this.port.type.type];
-				ctx.moveTo(port.x + port.module.screenX, port.y + port.module.screenY);
+				ctx.strokeStyle = colors.port_temp[this.port.type];
+				ctx.moveTo(port.localX + port.module.worldX, port.localY + port.module.worldY);
 				ctx.lineTo(e.offsetX, e.offsetY);
 				ctx.stroke();
 			},
@@ -191,10 +194,10 @@ function getClickItem(e) {
 	}
 	//functions used to check if click on anything
 	function pointIsOnModule(module) {
-		var x0 = module.screenX,
-			y0 = module.screenY,
-			x1 = module.screenX + module.width,
-			y1 = module.screenY + module.height;
+		var x0 = module.worldX,
+			y0 = module.worldY,
+			x1 = module.worldX + module.width,
+			y1 = module.worldY + module.height;
 		if (x > x0 && y > y0 && x < x1 && y < y1) {
 			return true;
 		}
@@ -203,25 +206,25 @@ function getClickItem(e) {
 		}
 	}
 	function pointIsOnPort(port) {
-		var portx = port.x + port.module.x,
-			porty = port.y + port.module.y,
+		var portx = port.localX + port.module.worldX,
+			porty = port.localY + port.module.worldY,
 			distx = x - portx,
 			disty = y - porty,
 			distance = Math.sqrt(distx * distx + disty * disty);
 
 		//check if clicked on port.
-		if (distance <= portRadius) {
+		if (distance <= portRadius * zoomMultiplier) {
 			return true;
-		} else {
+		}
+		else {
 			return false;
 		}
-
 	}
 	function pointIsOnConnection(connection) {
-		var x0 = connection.inputPort.x + connection.inputPort.module.x,
-			y0 = connection.inputPort.y + connection.inputPort.module.y,
-			x1 = connection.outputPort.x + connection.outputPort.module.x,
-			y1 = connection.outputPort.y + connection.outputPort.module.y;
+		var x0 = connection.inputPort.localX + connection.inputPort.module.worldX,
+			y0 = connection.inputPort.localY + connection.inputPort.module.worldY,
+			x1 = connection.outputPort.localX + connection.outputPort.module.worldX,
+			y1 = connection.outputPort.localY + connection.outputPort.module.worldY;
 
 		//check if is within bounds
 		var xMin = Math.min(x0, x1) - connectionThickness / 2,
@@ -311,7 +314,6 @@ function zoom(event) {
 	event.preventDefault();
 
 	zoomMultiplier += Math.sign(-event.deltaY) * zoomStep;
-	console.log(`Zoom is ${zoomMultiplier}`);
 
 	// Restrict scale
 	zoomMultiplier = clamp(zoomMultiplier, minZoom, maxZoom);
