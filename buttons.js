@@ -90,15 +90,13 @@ try {
 } catch (e) {
 	console.log('could not load saved data.');
 	//Add input and output modules
-	var inputModule = CreateModule('input');
-	inputModule.x -= 180;
+	var inputModule = new Module('input');
+	inputModule.pos.x -= 100;
 
-	var outputModule = CreateModule('output');
-	outputModule.x += 180;
+	var outputModule = new Module('output');
+	outputModule.pos.x += 100;
 
-
-
-	CreateConnection(inputModule.outputs[0], outputModule.inputs[0]);
+	new Connection(inputModule.outputs[0], outputModule.inputs[0]);
 }
 
 

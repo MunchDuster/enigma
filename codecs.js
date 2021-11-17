@@ -4,7 +4,6 @@ const variableParent = document.querySelector('.VariableParent');
 
 // multi codec vars
 var vars = {
-
 	isEven: true
 };
 

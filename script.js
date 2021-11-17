@@ -31,10 +31,10 @@ function saveset() {
 		);
 		alert("Saved.");
 
-	} catch (e) {
+	}
+	catch (e) {
 		alert("Could not save.");
 	}
-
 }
 function newId() {
 	var id = "";
@@ -52,13 +52,10 @@ async function copyText() {
 	range.selectNode(outpt);
 	window.getSelection().removeAllRanges(); // clear current selection
 	window.getSelection().addRange(range); // to select text
-	document.execCommand("copy");
 	window.getSelection().removeAllRanges(); // to deselect
 
 	/* Alert the copied text */
 }
-
-
 
 //try to load saved setup
 try {

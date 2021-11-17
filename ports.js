@@ -1,59 +1,61 @@
 const ports = [];
 var portNo = 0;
 
-function CreatePortObj(module, isInput, place, type, name) {
-	return {
-		class: 'port',
-		place: place,
-		module: module,
-		isInput: isInput,
-		type: type,
-		connections: isInput ? null : [],
-		id: portNo++,
-		name: name
-	};
+class Port {
+	constructor(module, isInput, place, type, name) {
+		this.i = place;
+		this.module = module;
+		this.isInput = isInput;
+		this.type = type;
+		this.connections = isInput ? null : [];
+		this.id = portNo++;
+		this.name = name;
+
+		//Add to ports list
+		ports.push(this);
+
+		//Save the index in the list
+		this.index = ports.length - 1;
+	}
+
+	get pos() {
+		return this.localPos.add(this.module.pos);
+	}
+
+	get screenPos() {
+		return Vector2.WorldToScreen(this.module.pos).add(this.localPos);
+	}
+
+	destroy() {
+		ports.splice(this.index, 1);
+	}
 }
 
 function CreateInputPort(module, place, type, name) {
-	var obj = CreatePortObj(module, true, place, type, name)
+	var port = new Port(module, true, place, type, name)
 
-	Object.defineProperty(obj, 'localX', {
-		get: function () { return 8 * zoomMultiplier }
-	});
-	Object.defineProperty(obj, 'localY', {
-		get: function () { return module.height * (obj.place + 1) / (module.inputs.length + 1) }
+	Object.defineProperty(port, 'localPos', {
+		get: function () {
+			return new Vector2(
+				8 * zoomMultiplier,
+				module.height * (port.i + 1) / (module.inputs.length + 1)
+			);
+		}
 	});
 
-	ports.push(obj);
-	return obj;
+	return port;
 }
 function CreateOutputPort(module, place, type, name) {
-	var obj = CreatePortObj(module, false, place, type, name)
+	var port = new Port(module, false, place, type, name)
 
-	Object.defineProperty(obj, 'localX', {
-		get: function () { return module.width - 8 * zoomMultiplier }
-	});
-	Object.defineProperty(obj, 'localY', {
-		get: function () { return (module.height * (obj.place + 1)) / (module.outputs.length + 1); }
-	});
-
-	ports.push(obj);
-	return obj;
-}
-
-function DeletePort(port) {
-	function getIndex() {
-		for (var i = 0; i < ports.length; i++) {
-			if (ports[i].id === port.id) {
-				return i;
-			}
+	Object.defineProperty(port, 'localPos', {
+		get: function () {
+			return new Vector2(
+				module.width - 8 * zoomMultiplier,
+				module.height * (port.i + 1) / (module.outputs.length + 1)
+			);
 		}
-		return -1;
-	}
-	var index = getIndex();
-	if (index != -1) {
-		ports.splice(index, 1);
-	} else {
-		console.log(`Port doesnt exist: ${port.id}`);
-	}
+	});
+
+	return port;
 }

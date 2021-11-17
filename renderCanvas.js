@@ -1,6 +1,5 @@
 var zoomMultiplier = 1,
-	offsetX = 0,
-	offsetY = 0;
+	offset = Vector2.Zero;
 
 //Render settings
 var connectionThickness = 5,
@@ -89,23 +88,45 @@ function renderCanvas(e) {
 
 	//draw the background grid
 	function drawGrid() {
-		var gridS = gridSize * zoomMultiplier,
-			offX = offsetX % gridS,
-			offY = offsetY % gridS;
+		var gridS = gridSize,
+			canvasTop = Vector2.ScreenToWorld(Vector2.Zero),
+			canvasBottom = Vector2.ScreenToWorld(new Vector2(canvas.width, canvas.height)),
+			canvasMiddle = canvasTop.lerp(canvasBottom, 0.5);
+
 
 		ctx.beginPath();
 		ctx.strokeStyle = colors.grid;
 		ctx.lineWidth = gridThickness;
 		//draw horizontal lines
-		for (var y = offY; y <= canvas.height; y += gridS) {
-			ctx.moveTo(0, y);
-			ctx.lineTo(canvas.width, y);
+		for (var middleY = canvasMiddle.y, n = 0; middleY + gridS * n <= canvasBottom.y; n++) {
+
+			var y1 = middleY + gridS * n,
+				y2 = middleY - gridS * n,
+				screenY1 = Vector2.WorldToScreen(new Vector2(0, y1)).y + offset.y % gridS,
+				screenY2 = Vector2.WorldToScreen(new Vector2(0, y2)).y + offset.y % gridS;
+
+			ctx.moveTo(0, screenY1);
+			ctx.lineTo(canvas.width, screenY1);
+			ctx.stroke();
+
+			ctx.moveTo(0, screenY2);
+			ctx.lineTo(canvas.width, screenY2);
 			ctx.stroke();
 		}
-		//draw vertical lines
-		for (var x = offX; x <= canvas.width; x += gridS) {
-			ctx.moveTo(x, 0);
-			ctx.lineTo(x, canvas.height);
+		ctx.beginPath();
+		for (var middleX = canvasMiddle.x, n = 0; middleX + gridS * n <= canvasBottom.x; n++) {
+
+			var x1 = middleX + gridS * n,
+				x2 = middleX - gridS * n,
+				screenX1 = Vector2.WorldToScreen(new Vector2(x1, 0)).x + offset.x % gridS,
+				screenX2 = Vector2.WorldToScreen(new Vector2(x2, 0)).x + offset.x % gridS
+
+			ctx.moveTo(screenX1, 0);
+			ctx.lineTo(screenX1, canvas.width);
+			ctx.stroke();
+
+			ctx.moveTo(screenX2, 0);
+			ctx.lineTo(screenX2, canvas.width);
 			ctx.stroke();
 		}
 	}
@@ -113,25 +134,27 @@ function renderCanvas(e) {
 	function drawConnection(port1, port2) {
 		//render line	
 		ctx.strokeStyle = colors.port_set[port1.type];
-		ctx.moveTo(port1.localX + port1.module.worldX, port1.localY + port1.module.worldY);
-		ctx.lineTo(port2.localX + port2.module.worldX, port2.localY + port2.module.worldY);
+
+		var startpoint = port1.screenPos;
+		var endpoint = port2.screenPos;
+
+		ctx.moveTo(startpoint.x, startpoint.y);
+		ctx.lineTo(endpoint.x, endpoint.y);
 		ctx.stroke();
 	}
 	//draw the modules
 	function drawModule(module) {
 		//get the module display corners
-		var x0 = module.worldX,
-			y0 = module.worldY,
-			x1 = module.worldX + module.width,
-			y1 = module.worldY + module.height;
+		var p0 = Vector2.WorldToScreen(module.pos),
+			p1 = p0.add(module.size);
 
 		//draw module box
 		ctx.beginPath();
 		ctx.fillStyle = colors.module_bg;
-		ctx.moveTo(x0, y0);
-		ctx.lineTo(x0, y1);
-		ctx.lineTo(x1, y1);
-		ctx.lineTo(x1, y0);
+		ctx.moveTo(p0.x, p0.y);
+		ctx.lineTo(p0.x, p1.y);
+		ctx.lineTo(p1.x, p1.y);
+		ctx.lineTo(p1.x, p0.y);
 		ctx.fill();
 
 		//draw module label
@@ -140,31 +163,31 @@ function renderCanvas(e) {
 		ctx.font = moduleFont();
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
-		ctx.fillText(module.codec.getName(), lerp(x0, x1, 0.5), lerp(y0, y1, 0.5));
+		ctx.fillText(module.codec.getName(), lerp(p0.x, p1.x, 0.5), lerp(p0.y, p1.y, 0.5));
 
 		//draw input ports
 		for (var j = 0; j < module.inputs.length; j++) {
 			var port = module.inputs[j],
-				x = port.localX + port.module.worldX,
-				y = port.localY + port.module.worldY;
+				pos = port.screenPos,
+				radius = portRadius * zoomMultiplier;
 
 			//draw the port circle
 			ctx.beginPath();
 			ctx.fillStyle = colors.port_set[port.type];
-			ctx.arc(x, y, portRadius * zoomMultiplier, 0, 2 * Math.PI);
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
 			ctx.fill();
 		}
 
 		//draw output ports
 		for (var j = 0; j < module.outputs.length; j++) {
 			var port = module.outputs[j],
-				x = port.localX + port.module.worldX,
-				y = port.localY + port.module.worldY;
+				pos = port.screenPos,
+				radius = portRadius * zoomMultiplier;
 
 			//draw the port circle
 			ctx.beginPath();
 			ctx.fillStyle = colors.port_set[port.type];
-			ctx.arc(x, y, portRadius * zoomMultiplier, 0, 2 * Math.PI);
+			ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
 			ctx.fill();
 		}
 	}

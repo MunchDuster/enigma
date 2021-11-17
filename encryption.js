@@ -7,8 +7,8 @@ function getModulesOrder() {
 		//increment order counter
 		//got to the inputs
 		for (var i = 0; i < module.inputs.length; i++) {
-			if (module.inputs[i].connections != null) {
-				var connectedModule = module.inputs[i].connections.module;
+			if (module.inputs[i].connection != null) {
+				var connectedModule = module.inputs[i].connection.outputPort.module;
 				if (modulesOrder.includes(connectedModule)) {
 					//remove from array at that place
 					modulesOrder.splice(modulesOrder.indexOf(connectedModule), 1);
@@ -37,7 +37,9 @@ function encode() {
 		//get the inputs values
 		var inputValues = [];
 		for (var j = 0; j < module.inputs.length; j++) {
-			var port = module.inputs[j];
+
+			var port = module.inputs[j].connection.outputPort;
+			console.log(port)
 			inputValues.push(port.value);
 		}
 		//calculate output values

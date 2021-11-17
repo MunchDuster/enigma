@@ -27,7 +27,7 @@ for (var codecName in codecs) {
 	//click listener
 	button.addEventListener('click', (e) => {
 		console.log(e.target);
-		CreateModule(e.target.getAttribute('codec'));
+		new Module(e.target.getAttribute('codec'));
 	})
 	button.innerText = codecName;
 
